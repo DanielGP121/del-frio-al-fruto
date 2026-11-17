@@ -1,0 +1,7 @@
+# Only the printable kit is published: the seven PDFs, the README and the licence.
+# Everything else in this folder (sources, internal notes, previews) stays out of the repository.
+*
+!.gitignore
+!README.md
+!LICENSE.md
+!0[1-5]_*.pdf
