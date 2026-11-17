@@ -1,4 +1,4 @@
-# ¡A por la cosecha!
+# Del frío al fruto
 
 Un juego de preguntas para imprimir y jugar en grupo: dar la vuelta al año de un frutal, del reposo del invierno a la fruta del final del verano. Las preguntas tratan del reposo invernal, la floración y la polinización, la fotosíntesis y el fruto.
 

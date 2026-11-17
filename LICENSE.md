@@ -1,6 +1,6 @@
 # Licencia
 
-«¡A por la cosecha!» © 2026 Daniel González Palazón, Estación Experimental de Aula Dei (EEAD-CSIC).
+«Del frío al fruto» © 2026 Daniel González Palazón, Estación Experimental de Aula Dei (EEAD-CSIC).
 
 Esta obra está bajo una licencia Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0).
 
