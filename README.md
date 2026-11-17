@@ -2,6 +2,8 @@
 
 Un juego de preguntas para imprimir y jugar en grupo: dar la vuelta al año de un frutal, del reposo del invierno a la fruta del final del verano. Las preguntas tratan del reposo invernal, la floración y la polinización, la fotosíntesis y el fruto.
 
+También se puede jugar sin imprimir nada, desde un móvil, una tableta o un ordenador: **[danielgp121.github.io/del-frio-al-fruto](https://danielgp121.github.io/del-frio-al-fruto/)**. Un dispositivo hace de tablero y de tarjetas para 2 a 6 equipos, con las mismas reglas.
+
 Lo creó Daniel González Palazón, de la [Estación Experimental de Aula Dei (EEAD-CSIC)](https://www.eead.csic.es/), para la Semana de la Ciencia 2026.
 
 Si has llegado aquí escaneando el QR del tablero, gracias: así sabemos a cuánta gente llega el juego.
