@@ -1,4 +1,4 @@
-// Browser version of "¡A por la cosecha!", a quiz board game about the year of a fruit tree.
+// Browser version of the quiz board game about the year of a fruit tree (name in datos.js).
 // One device plays the referee for 2 to 6 teams with the rules of the printed kit: every team
 // answers each question at once, the decks go in a fixed order, right answers move 2, 3 or 4
 // stones, special stones and challenges work as on the board, and the first team round the
@@ -8,9 +8,10 @@
 
   const D = window.GAME_DATA;
   const N = D.board.n;
-  const KIT_URL = "https://github.com/DanielGP121/a-por-la-cosecha";
-  const STORE_KEY = "a-por-la-cosecha/partida";
-  const SETUP_KEY = "a-por-la-cosecha/equipos";
+  const KIT_URL = D.game.repoUrl;
+  // Every GitHub Pages site of an account shares one origin, so the saved game is keyed by repository
+  const STORE_KEY = `${D.game.slug}/partida`;
+  const SETUP_KEY = `${D.game.slug}/equipos`;
   const REDUCED = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const STEP_MS = REDUCED ? 70 : 240;
   const Q = Object.fromEntries(D.questions.map((q) => [q.id, q]));
@@ -115,10 +116,16 @@
     return `<text x="${f1(x)}" y="${f1(y)}" font-family="${o.black ? FONT_B : FONT}" font-size="${o.size || 5}" font-weight="${o.black ? 900 : (o.weight || 400)}"${o.italic ? ' font-style="italic"' : ""} fill="${o.fill ? hex(o.fill) : hex(C.navy)}" text-anchor="${o.anchor || "start"}" dominant-baseline="central"${o.extra ? " " + o.extra : ""}>${esc(s)}</text>`;
   }
   const svgIcon = (name, cx, cy, size, color, extra = "") => `<svg x="${f1(cx - size / 2)}" y="${f1(cy - size / 2)}" width="${size}" height="${size}" viewBox="0 0 512 512" fill="${hex(color)}" ${extra}>${D.icons[name]}</svg>`;
-  const ptsStar = (cx, cy, ro, ri, n = 8) => Array.from({ length: 2 * n }, (_, k) => { const a = (-90 + k * 180 / n) * Math.PI / 180, r = k % 2 ? ri : ro; return `${f1(cx + r * Math.cos(a))},${f1(cy + r * Math.sin(a))}`; }).join(" ");
-  const ptsOct = (cx, cy, r) => Array.from({ length: 8 }, (_, k) => { const a = (22.5 + k * 45) * Math.PI / 180; return `${f1(cx + r * Math.cos(a))},${f1(cy + r * Math.sin(a))}`; }).join(" ");
-  const lucky = (x, y, s = 1) => ptsStar(x, y, 17.2 * s, 12.8 * s);
-  const unlucky = (x, y, s = 1) => ptsOct(x, y, 15.8 * s);
+  // Special stones and their shapes are drawn by the printed board builder and arrive as SVG
+  // centred on (0, 0): here they are only moved into place and, for the legends, scaled down
+  const glyph = (good, cx, cy, s) => `<g transform="translate(${f1(cx)} ${f1(cy)}) scale(${f1(s)})">${D.board.shapes[good ? "good" : "bad"]}</g>`;
+  // Game title on two lines, small then big, sized to fit its plaque whatever the name
+  function titleSvg(cx, y1, y2, width, s1, s2, stroke) {
+    const [l1, l2] = D.game.lines;
+    const fit = (text, max, k) => Math.min(max, width / Math.max(1, text.length * k));
+    const big = T(cx, l1 ? y2 : (y1 + y2) / 2, l2, { black: true, size: fit(l2, s2, 0.78), fill: C.fruit, anchor: "middle", extra: `stroke="${hex(C.navy)}" stroke-width="${stroke}" paint-order="stroke"` });
+    return (l1 ? T(cx, y1, l1, { black: true, size: fit(l1, s1, 0.7), anchor: "middle" }) : "") + big;
+  }
   function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   const MOTIF = {
     winter: `<g stroke="#B5D0E8" stroke-width="0.6" stroke-linecap="round"><line x1="-3" y1="0" x2="3" y2="0"/><line x1="-1.5" y1="-2.6" x2="1.5" y2="2.6"/><line x1="-1.5" y1="2.6" x2="1.5" y2="-2.6"/></g>`,
@@ -169,8 +176,7 @@
   function innerLandscape(g) {
     const { W, CX } = g;
     let out = `<rect x="151" y="49.5" width="118" height="40" rx="8" fill="#FFFFFF" fill-opacity="0.86"/>`;
-    out += T(CX, 59.5, "¡A POR LA", { black: true, size: 8.6, anchor: "middle" });
-    out += T(CX, 74, "COSECHA!", { black: true, size: 16.5, fill: C.fruit, anchor: "middle", extra: `stroke="${hex(C.navy)}" stroke-width="0.55" paint-order="stroke"` });
+    out += titleSvg(CX, 59.5, 74, 108, 8.6, 16.5, 0.55);
     out += T(CX, 84.5, "Da la vuelta al año de un frutal sin perder la fruta", { size: 4.3, italic: true, anchor: "middle" });
     for (const z of D.board.zones) {
       const [sx, sy] = QUAD[z.key], c = C[z.key];
@@ -198,8 +204,7 @@
   function innerPortrait(g) {
     const { CX } = g;
     let out = `<rect x="58" y="51" width="181" height="44" rx="9" fill="#FFFFFF" fill-opacity="0.86"/>`;
-    out += T(CX, 62, "¡A POR LA", { black: true, size: 9.5, anchor: "middle" });
-    out += T(CX, 81, "COSECHA!", { black: true, size: 19, fill: C.fruit, anchor: "middle", extra: `stroke="${hex(C.navy)}" stroke-width="0.6" paint-order="stroke"` });
+    out += titleSvg(CX, 62, 81, 170, 9.5, 19, 0.6);
     for (const z of D.board.zones) {
       const [sx, sy] = QUAD[z.key], c = C[z.key], y = sy < 0 ? 110 : 290;
       const xi = sx > 0 ? 242 : 55, anchor = sx > 0 ? "end" : "start", xt = sx > 0 ? xi - 12 : xi + 12;
@@ -214,8 +219,8 @@
   function legendPlaque(x, y, w, h, size, credits) {
     const rows = [
       [(cx, cy) => `<circle cx="${cx}" cy="${cy}" r="${size * 0.8}" fill="${hex(C.reto)}"/>` + svgIcon("GiStarMedal", cx, cy, size * 1.15, C.navy), "Reto: supera la prueba y avanza 3"],
-      [(cx, cy) => `<polygon points="${lucky(cx, cy, size * 0.052)}" fill="${hex(C.good)}"/>`, "Estrella con suerte: avanza"],
-      [(cx, cy) => `<polygon points="${unlucky(cx, cy, size * 0.052)}" fill="${hex(C.bad)}"/>`, "Octógono de mala pata: retrocede"],
+      [(cx, cy) => glyph(true, cx, cy, size * 0.055), "Con suerte: avanza"],
+      [(cx, cy) => glyph(false, cx, cy, size * 0.055), "Mala pata: retrocede"],
     ];
     const step = size * 1.75, top = y + size * 1.35;
     let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#FFFFFF" fill-opacity="0.88"/>`;
@@ -242,8 +247,7 @@
     for (let k = 0; k < N; k++) {
       const [x, y] = P[k], ev = D.board.events[k], reto = D.board.retos.includes(k), z = seasonOf(k);
       const r = k === 0 ? 19 : STONE;
-      let s = ev ? `<polygon points="${ev.delta > 0 ? lucky(x + 0.7, y + 1) : unlucky(x + 0.7, y + 1)}" fill="${hex(C.navy)}" fill-opacity="0.22"/>`
-        : `<circle cx="${f1(x + 0.7)}" cy="${f1(y + 1)}" r="${r}" fill="${hex(C.navy)}" fill-opacity="0.22"/>`;
+      let s = ev ? "" : `<circle cx="${f1(x + 0.7)}" cy="${f1(y + 1)}" r="${r}" fill="${hex(C.navy)}" fill-opacity="0.22"/>`;
       if (k === 0) {
         s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${r}" fill="${hex(C.navy)}" stroke="${hex(C.reto)}" stroke-width="1.8"/>` + svgIcon("GiFruitBowl", x, y - 0.3, 15, C.reto);
         s += T(x, y - 11.2, "SALIDA", { black: true, size: 3.9, fill: "FFFFFF", anchor: "middle" }) + T(x, y + 12, "META", { black: true, size: 4.4, fill: "FFFFFF", anchor: "middle" });
@@ -251,10 +255,7 @@
         s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${r}" fill="${hex(C.reto)}" stroke="#FFFFFF" stroke-width="1.6"/>` + svgIcon("GiStarMedal", x, y - 2.4, 13.5, C.navy);
         s += T(x, y + 8.6, "RETO", { black: true, size: 4.3, anchor: "middle" });
       } else if (ev) {
-        const good = ev.delta > 0, c = good ? C.good : C.bad;
-        s += `<polygon points="${good ? lucky(x, y) : unlucky(x, y)}" fill="${good ? "#EAF6EC" : "#FDECEC"}" stroke="${hex(c)}" stroke-width="2.2" stroke-linejoin="round"/>`;
-        s += svgIcon(ev.icon, x - 1.4, y - 1.4, 13.5, C[z]);
-        s += `<circle cx="${f1(x + 8.6)}" cy="${f1(y + 8.6)}" r="5.6" fill="${hex(c)}" stroke="#FFFFFF" stroke-width="1"/>` + T(x + 8.6, y + 8.8, (good ? "+" : "−") + Math.abs(ev.delta), { black: true, size: 5.4, fill: "FFFFFF", anchor: "middle" });
+        s += `<g transform="translate(${f1(x)} ${f1(y)})">${ev.svg}</g>`;
       } else {
         s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${r}" fill="${hex(C[z])}" stroke="#FFFFFF" stroke-width="1.6"/>` + T(x, y + 0.6, String(k), { black: true, size: 11, fill: "FFFFFF", anchor: "middle" });
       }
@@ -808,9 +809,12 @@
   window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (S) drawBoard(); }, 150); });
 
   // § 15 — Start: the key to the special stones in the rules, the counter, then the setup screen
+  // Each line shows the stone as the board draws it, so the key follows any change of shape
+  const mini = (inner) => `<svg class="mini" viewBox="-19 -19 39 39" aria-hidden="true">${inner}</svg>`;
+  const retoMini = `<circle r="14.5" fill="${hex(C.reto)}" stroke="#FFFFFF" stroke-width="1.6"/>` + svgIcon("GiStarMedal", 0, -2.4, 13.5, C.navy);
   $("#legend").innerHTML = [
-    `<li>${icon("GiStarMedal")}<span><b>Reto</b> (círculo amarillo con medalla): el equipo hace una prueba en el momento.</span><span class="d" style="background:#B8860B">+${D.board.retoReward}</span></li>`,
-    ...Object.entries(D.board.events).map(([k, ev]) => `<li style="color:${hex(C[seasonOf(+k)])}">${icon(ev.icon)}<span style="color:var(--ink)"><b>Casilla ${k}</b>, ${ev.delta > 0 ? "estrella verde" : "octógono rojo"}: ${esc(ev.text)}.</span><span class="d" style="background:${hex(ev.delta > 0 ? C.good : C.bad)}">${ev.delta > 0 ? "+" : "−"}${Math.abs(ev.delta)}</span></li>`),
+    `<li>${mini(retoMini)}<span><b>Reto</b> (casilla amarilla con medalla): el equipo hace una prueba en el momento.</span><span class="d" style="background:#B8860B">+${D.board.retoReward}</span></li>`,
+    ...Object.entries(D.board.events).map(([k, ev]) => `<li>${mini(ev.svg)}<span><b>Casilla ${k}</b>, ${ev.delta > 0 ? "con suerte" : "de mala pata"}: ${esc(ev.text)}.</span><span class="d" style="background:${hex(ev.delta > 0 ? C.good : C.bad)}">${ev.delta > 0 ? "+" : "−"}${Math.abs(ev.delta)}</span></li>`),
   ].join("");
   counter.init();
   showSetup();

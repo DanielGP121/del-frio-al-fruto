@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>¡A por la cosecha!</title>
+<title>Del frío al fruto</title>
 <meta name="description" content="Juego de preguntas para jugar en grupo desde el navegador: dad la vuelta al año de un frutal, del reposo del invierno a la fruta del final del verano. De 2 a 6 equipos, unos 15 minutos.">
 <meta name="theme-color" content="#1E3A5F">
-<meta property="og:title" content="¡A por la cosecha!">
+<meta property="og:title" content="Del frío al fruto">
 <meta property="og:description" content="Juego de preguntas sobre el año de un frutal: reposo invernal, flores y polen, hojas y luz, y fruto. Para jugar en grupo desde el navegador.">
-<meta property="og:image" content="https://danielgp121.github.io/a-por-la-cosecha/img/centro.jpg">
+<meta property="og:image" content="https://danielgp121.github.io/del-frio-al-fruto/img/centro.jpg">
+<meta property="og:url" content="https://danielgp121.github.io/del-frio-al-fruto/">
 <link rel="icon" type="image/png" href="img/icono.png">
 <link rel="apple-touch-icon" href="img/icono.png">
 <script>
-  // Game counter (GoatCounter). Put the site code of the GoatCounter account here, for instance
-  // "a-por-la-cosecha" for https://a-por-la-cosecha.goatcounter.com. Empty means nothing is counted.
+  // GoatCounter site code, set in _fuente/build_web.js (COUNTER_CODE). Empty means nothing is counted.
   window.COUNTER_CODE = "";
 </script>
 <style>
@@ -39,7 +39,7 @@ a { color: var(--winter) }
 .setup { max-width: 760px; margin: 0 auto; padding: 18px 16px 28px }
 .hero { display: flex; align-items: center; gap: 18px; padding: 6px 0 14px }
 .hero .medal { width: 132px; height: 132px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 0 2px var(--navy), 0 6px 18px rgba(30, 58, 95, .25); flex: 0 0 auto; object-fit: cover }
-.hero h1 { margin: 0; font: 900 44px/0.95 var(--black); color: var(--fruit); -webkit-text-stroke: 1.2px var(--navy); paint-order: stroke fill; letter-spacing: .5px }
+.hero h1 { margin: 0; overflow-wrap: anywhere; font: 900 44px/0.95 var(--black); color: var(--fruit); -webkit-text-stroke: 1.2px var(--navy); paint-order: stroke fill; letter-spacing: .5px }
 .hero h1 small { display: block; font-size: 22px; color: var(--navy); -webkit-text-stroke: 0; margin-bottom: 4px }
 .hero p { margin: 8px 0 0; font-size: 16px }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px }
@@ -242,6 +242,7 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
 .legend { list-style: none; padding: 0 !important; margin: 0 }
 .legend li { display: flex; align-items: center; gap: 10px; margin-bottom: 6px }
 .legend .gi { font-size: 22px }
+.legend .mini { width: 32px; height: 32px; flex: 0 0 auto }
 .legend .d { margin-left: auto; min-width: 38px; text-align: center; border-radius: 999px; color: #fff; font: 900 13px var(--black); padding: 2px 8px }
 </style>
 </head>
@@ -251,7 +252,7 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
   <div class="hero">
     <img class="medal" src="img/centro.jpg" alt="Un melocotonero en las cuatro estaciones">
     <div>
-      <h1><small>¡A POR LA</small>COSECHA!</h1>
+      <h1><small>DEL FRÍO</small>AL FRUTO</h1>
       <p>Un juego de preguntas para dar la vuelta al año de un frutal sin perder la fruta: del reposo del invierno a la fruta del final del verano.</p>
       <div class="chips"><span>De 2 a 6 equipos</span><span>A partir de 12 años</span><span>Unos 15 minutos</span></div>
     </div>
@@ -284,7 +285,7 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
     <button class="primary go" type="submit">¡A jugar!</button>
     <div class="links">
       <button type="button" class="linkbtn" data-act="rules">Cómo se juega</button>
-      <a href="https://github.com/DanielGP121/a-por-la-cosecha">Versión para imprimir</a>
+      <a href="https://github.com/DanielGP121/del-frio-al-fruto">Versión para imprimir</a>
     </div>
   </form>
 
@@ -298,7 +299,7 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
 
 <div id="game" class="game" data-view="card" hidden>
   <header class="bar">
-    <div class="brand"><img src="img/icono.png" alt=""><span>¡A por la cosecha!</span></div>
+    <div class="brand"><img src="img/icono.png" alt=""><span>Del frío al fruto</span></div>
     <div class="round" id="roundInfo"></div>
     <button id="clock" class="clock" type="button" data-act="clock" aria-label="Pausar o seguir el reloj" hidden></button>
     <button class="iconbtn" type="button" data-act="rules" aria-label="Cómo se juega">?</button>
