@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>¡A por la cosecha!</title>
+<meta name="description" content="Juego de preguntas para jugar en grupo desde el navegador: dad la vuelta al año de un frutal, del reposo del invierno a la fruta del final del verano. De 2 a 6 equipos, unos 15 minutos.">
+<meta name="theme-color" content="#1E3A5F">
+<meta property="og:title" content="¡A por la cosecha!">
+<meta property="og:description" content="Juego de preguntas sobre el año de un frutal: reposo invernal, flores y polen, hojas y luz, y fruto. Para jugar en grupo desde el navegador.">
+<meta property="og:image" content="https://danielgp121.github.io/a-por-la-cosecha/img/centro.jpg">
+<link rel="icon" type="image/png" href="img/icono.png">
+<link rel="apple-touch-icon" href="img/icono.png">
+<script>
+  // Game counter (GoatCounter). Put the site code of the GoatCounter account here, for instance
+  // "a-por-la-cosecha" for https://a-por-la-cosecha.goatcounter.com. Empty means nothing is counted.
+  window.COUNTER_CODE = "";
+</script>
+<style>
+:root {
+  --navy: #1E3A5F; --ink: #1B2A41; --muted: #5B6878; --paper: #FBF6EC; --line: #E4DCCB;
+  --winter: #1F6FA8; --spring: #D81B60; --summer: #2E7D4F; --fruit: #EF8A17; --reto: #F9B000;
+  --good: #2E7D4F; --bad: #C62828;
+  --black: "Arial Black", "Segoe UI Black", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --sans: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius: 14px;
+}
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100% }
+body { background: var(--paper); color: var(--ink); font: 16px/1.42 var(--sans); -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100% }
+button { font: inherit; color: inherit; cursor: pointer }
+button:disabled { cursor: default }
+a { color: var(--winter) }
+:focus-visible { outline: 3px solid var(--reto); outline-offset: 2px }
+[hidden] { display: none !important }
+.gi { width: 1em; height: 1em; fill: currentColor; flex: 0 0 auto }
+
+/* § Setup screen */
+.setup { max-width: 760px; margin: 0 auto; padding: 18px 16px 28px }
+.hero { display: flex; align-items: center; gap: 18px; padding: 6px 0 14px }
+.hero .medal { width: 132px; height: 132px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 0 2px var(--navy), 0 6px 18px rgba(30, 58, 95, .25); flex: 0 0 auto; object-fit: cover }
+.hero h1 { margin: 0; font: 900 44px/0.95 var(--black); color: var(--fruit); -webkit-text-stroke: 1.2px var(--navy); paint-order: stroke fill; letter-spacing: .5px }
+.hero h1 small { display: block; font-size: 22px; color: var(--navy); -webkit-text-stroke: 0; margin-bottom: 4px }
+.hero p { margin: 8px 0 0; font-size: 16px }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px }
+.hero > div { min-width: 0 }
+@media (max-width: 560px) {
+  .hero { flex-direction: column; text-align: center; gap: 12px }
+  .hero .medal { width: 116px; height: 116px }
+  .hero h1 { font-size: 40px }
+  .chips { justify-content: center }
+  .credits { flex-direction: column; align-items: flex-start }
+  .bar .deckname { display: none }
+}
+.chips span { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; font-size: 13.5px; font-weight: 600; color: var(--navy) }
+.box { background: #fff; border-radius: var(--radius); box-shadow: 0 1px 0 var(--line), 0 4px 16px rgba(30, 58, 95, .07); padding: 16px 16px 18px; margin-top: 14px }
+.box h2 { font: 900 17px/1.2 var(--black); color: var(--navy); margin: 16px 0 8px }
+.box h2:first-child { margin-top: 0 }
+.box h2 small { font: 400 14px var(--sans); color: var(--muted) }
+.help { color: var(--muted); font-size: 14px; margin: 6px 0 0 }
+.resume { border: 2px solid var(--reto); background: #FFF8E1 }
+.resume p { margin: 0 0 10px }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 6px }
+.seg button { min-width: 50px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font-weight: 700 }
+.seg button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff }
+.teamlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-top: 10px }
+.teamrow { display: flex; align-items: center; gap: 8px; background: #F7F4EE; border-radius: 12px; padding: 6px 8px }
+.teamrow input { flex: 1; min-width: 0; font: 800 16px var(--sans); text-transform: uppercase; border: 1px solid transparent; background: transparent; border-radius: 8px; padding: 7px 6px; color: var(--ink) }
+.teamrow input:hover, .teamrow input:focus { border-color: var(--line); background: #fff }
+.disc { width: 34px; height: 34px; border-radius: 50%; background: var(--tc); color: var(--ti); display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; font-size: 21px; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .85) }
+.disc.sm { width: 24px; height: 24px; font-size: 15px }
+.disc.xs { width: 18px; height: 18px; font-size: 11px; box-shadow: none }
+.stepper { display: inline-flex; align-items: center; gap: 6px }
+.stepper button { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font-size: 22px; font-weight: 700; line-height: 1 }
+.stepper input { width: 84px; height: 44px; text-align: center; font: 700 18px var(--sans); border: 2px solid var(--line); border-radius: 12px; -moz-appearance: textfield }
+.stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0 }
+.go { display: block; width: 100%; margin-top: 20px }
+.links { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin: 14px 0 0; font-size: 15px }
+.linkbtn { background: none; border: 0; padding: 4px; color: var(--winter); text-decoration: underline; text-underline-offset: 2px }
+.credits { display: flex; align-items: center; gap: 14px; margin-top: 22px; color: var(--muted); font-size: 13px; line-height: 1.45 }
+.credits img { height: 46px; width: auto; flex: 0 0 auto }
+.credits b { color: var(--navy) }
+
+/* § Buttons */
+.primary { min-height: 52px; border: 0; border-radius: 14px; background: var(--navy); color: #fff; font: 900 18px var(--black); letter-spacing: .3px; padding: 0 18px; box-shadow: 0 3px 0 #10243d; display: inline-flex; align-items: center; justify-content: center; gap: 10px }
+.primary:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #10243d }
+.primary:disabled { background: #AEB7C2; box-shadow: none }
+.primary .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--dc); box-shadow: 0 0 0 2px #fff }
+.btn { min-height: 48px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font-weight: 700; padding: 0 14px }
+.btn.good { background: var(--good); border-color: var(--good); color: #fff }
+.btn.bad { background: #fff; border-color: var(--bad); color: var(--bad) }
+
+/* § Game layout: header, tabs (narrow screens), board and side panel */
+.game { height: 100vh; height: 100dvh; display: flex; flex-direction: column }
+.bar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; padding-top: max(8px, env(safe-area-inset-top)); background: var(--navy); color: #fff; flex: 0 0 auto }
+.bar .brand { display: flex; align-items: center; gap: 8px; font: 900 17px var(--black); color: var(--reto); white-space: nowrap; min-width: 0 }
+.bar .brand img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff }
+.bar .round { flex: 1; min-width: 0; font-size: 14px; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right }
+.clock { min-width: 82px; height: 38px; border-radius: 10px; border: 0; background: rgba(255, 255, 255, .14); color: #fff; font: 800 17px var(--sans); font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; justify-content: center; gap: 6px }
+.clock.paused { background: rgba(255, 255, 255, .3) }
+.clock.low { background: #B71C1C }
+.iconbtn { width: 38px; height: 38px; border-radius: 10px; border: 0; background: rgba(255, 255, 255, .14); color: #fff; font: 800 18px var(--sans); flex: 0 0 auto }
+.tabs { display: none }
+.stage { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) clamp(340px, 32vw, 450px) }
+.boardWrap { min-height: 0; min-width: 0; padding: 10px; display: flex; align-items: center; justify-content: center }
+.boardWrap svg { width: 100%; height: 100%; display: block }
+.side { min-height: 0; display: flex; flex-direction: column; background: #fff; border-left: 1px solid var(--line) }
+.panel { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 14px 18px; -webkit-overflow-scrolling: touch }
+.actions { flex: 0 0 auto; padding: 10px 14px; padding-bottom: max(10px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #fff }
+.actions .note { font-size: 14px; color: var(--muted); margin: 0 0 8px; text-align: center }
+.actions .primary { width: 100% }
+.actions:empty { display: none }
+
+@media (max-width: 860px) {
+  .bar .brand span { display: none }
+  .bar .round { text-align: left }
+  .tabs { display: flex; gap: 6px; padding: 6px 10px; background: #fff; border-bottom: 1px solid var(--line); flex: 0 0 auto }
+  .tabs button { flex: 1; min-height: 40px; border-radius: 10px; border: 2px solid var(--line); background: #fff; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 6px }
+  .tabs button[aria-selected="true"] { background: var(--navy); color: #fff; border-color: var(--navy) }
+  .tabs button .badge { width: 9px; height: 9px; border-radius: 50%; background: var(--reto) }
+  .stage { display: flex; flex-direction: column }
+  .side { border-left: 0; flex: 1 }
+  .game[data-view="card"] .boardWrap { display: none }
+  .game[data-view="board"] .side { flex: 0 0 auto }
+  .game[data-view="board"] .panel { display: none }
+  .boardWrap { flex: 1; padding: 6px }
+  .toast { top: 116px }
+  .panel > * { max-width: 640px; margin-left: auto; margin-right: auto }
+}
+
+/* § Question and challenge cards, styled like the printed ones */
+.banner { background: var(--reto); color: var(--navy); font-weight: 800; border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; text-align: center }
+.card { border: 3px solid var(--c); border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 4px 14px rgba(30, 58, 95, .12) }
+.card > header { background: var(--c); color: var(--ink2, #fff); display: flex; align-items: center; gap: 9px; padding: 8px 12px }
+.card > header .ic { width: 34px; height: 34px; border-radius: 50%; background: #fff; color: var(--c); display: inline-flex; align-items: center; justify-content: center; font-size: 23px }
+.card.reto > header .ic { color: var(--navy) }
+.card > header .cat { flex: 1; font: 900 17px/1 var(--black) }
+.card > header .code { font-size: 13px; opacity: .9 }
+.card .q { font-weight: 700; font-size: 19px; line-height: 1.3; margin: 0; padding: 14px 14px 10px }
+.opts { list-style: none; margin: 0; padding: 0 12px 4px; display: flex; flex-direction: column; gap: 8px }
+.opts li { display: flex; gap: 10px; align-items: flex-start; border: 2px solid transparent; border-radius: 12px; padding: 7px 8px; font-size: 16.5px; line-height: 1.3 }
+.opts li > b { flex: 0 0 30px; height: 30px; border-radius: 50%; background: var(--c); color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 900 15px var(--black) }
+.opts li .txt { flex: 1; padding-top: 3px }
+.opts li .who { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px }
+.opts li.right { border-color: var(--good); background: #EAF6EC }
+.opts li.right > b { background: var(--good) }
+.opts li.wrong { opacity: .62 }
+.opts li .tick { color: var(--good); font-weight: 900 }
+.card > footer { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px 12px }
+.dots { display: flex; gap: 5px }
+.dots i { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--c) }
+.dots i.on { background: var(--c) }
+.pill { background: var(--c); color: var(--ink2, #fff); border-radius: 999px; padding: 3px 12px 4px; font: 900 13.5px var(--black); letter-spacing: .3px }
+.sol { background: var(--t); border-top: 2px dashed var(--c); padding: 10px 14px 12px; font-size: 15.5px; line-height: 1.4 }
+.sol summary { cursor: pointer; font-weight: 700; color: var(--navy) }
+.sol p { margin: 0 }
+.sol details[open] summary { margin-bottom: 6px }
+
+/* § Answer marking: one row per team, three paddles each */
+.answers { margin-top: 14px }
+.answers .hint { margin: 0 0 8px; font-size: 15px; color: var(--muted) }
+.arow { display: flex; align-items: center; gap: 9px; padding: 6px 0; border-bottom: 1px solid #EEE8DC }
+.arow:last-child { border-bottom: 0 }
+.arow .tn { flex: 1; min-width: 0; font-weight: 800; line-height: 1.15; overflow-wrap: anywhere }
+.arow .tn small { display: block; font-weight: 400; color: var(--muted); font-size: 13px }
+.paddles { display: flex; gap: 6px }
+.paddles button { width: 48px; height: 48px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font: 900 19px var(--black); color: var(--navy) }
+.paddles button[aria-pressed="true"] { background: var(--tc); border-color: var(--tc); color: var(--ti); box-shadow: 0 0 0 2px #fff inset }
+.result { display: flex; align-items: center; gap: 6px; font-weight: 800; white-space: nowrap }
+.result .lt { width: 34px; height: 34px; border-radius: 10px; background: #F1EEE7; display: inline-flex; align-items: center; justify-content: center; font: 900 16px var(--black) }
+.result.ok { color: var(--good) }
+.result.ko { color: var(--bad) }
+
+/* § Challenge extras: who plays, countdown, secret card */
+.forteam { display: flex; align-items: center; gap: 8px; padding: 12px 14px 0; font-size: 16px }
+.rt { font: 900 22px/1.15 var(--black); color: var(--navy); margin: 0; padding: 8px 14px 0 }
+.timerbox { padding: 4px 14px 10px }
+.timerbox .count { font: 900 46px/1 var(--black); color: var(--navy); font-variant-numeric: tabular-nums; text-align: center; padding: 6px 0 }
+.timerbox .count.done { color: var(--bad) }
+.cover { margin: 8px 14px 12px; border: 2px dashed var(--navy); border-radius: 12px; padding: 18px 14px; text-align: center; background: #F4F6F9 }
+.cover p { margin: 0 0 12px }
+.choices { display: grid; gap: 8px; margin-top: 14px }
+.choices .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+.choices .btn { width: 100% }
+.choices .linkbtn { justify-self: center; font-size: 15px }
+.askwho { margin: 14px 0 0; font-weight: 700 }
+.whobtns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px }
+.whobtns .btn { display: inline-flex; align-items: center; gap: 8px }
+
+/* § Between questions: what happened and the standings */
+.panel h2 { font: 900 19px/1.2 var(--black); color: var(--navy); margin: 0 0 10px }
+.log { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 6px }
+.log li { background: #F7F4EE; border-radius: 10px; padding: 7px 10px; font-size: 15px; display: flex; gap: 8px; align-items: center }
+.log li .gi { font-size: 20px }
+.standings { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px }
+.standings li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 10px }
+.standings .nm { font-weight: 800; overflow-wrap: anywhere }
+.standings .where { font-size: 14px; color: var(--muted); white-space: nowrap }
+.standings .track { grid-column: 2 / 4; height: 9px; border-radius: 5px; background: #ECE6DA; overflow: hidden }
+.standings .track i { display: block; height: 100%; border-radius: 5px; background: var(--tc) }
+
+/* § End of the game */
+.win { text-align: center }
+.win .cup { width: 92px; height: 92px; margin: 4px auto 6px; border-radius: 50%; background: var(--tc); color: var(--ti); display: flex; align-items: center; justify-content: center; font-size: 58px; box-shadow: 0 0 0 4px #fff, 0 0 0 7px var(--reto) }
+.win h2 { font-size: 24px; margin: 8px 0 6px }
+.win .why { margin: 0 0 14px; color: var(--muted) }
+.diploma { border: 4px solid var(--navy); outline: 2px solid var(--reto); outline-offset: -9px; border-radius: 14px; padding: 18px 18px 16px; margin: 0 0 18px; background: #FFFDF7 }
+.diploma .d1 { font: 900 22px var(--black); color: var(--navy) }
+.diploma .d2 { font: 900 14px var(--black); color: var(--fruit); letter-spacing: .5px }
+.diploma .d3 { margin-top: 10px; font-size: 14px; color: var(--muted) }
+.diploma .d4 { font: 900 24px var(--black); color: var(--navy); margin: 2px 0 6px; overflow-wrap: anywhere }
+.diploma .d5 { font-size: 15px }
+.win .standings { text-align: left; margin-bottom: 14px }
+.win .stats { color: var(--muted); font-size: 14px; margin: 0 0 14px }
+.win .kit { display: inline-block; margin-top: 4px; font-weight: 700 }
+
+/* § Toast messages over the game, and the falling fruit at the end */
+.toast { position: fixed; left: 50%; top: 74px; transform: translate(-50%, -12px); opacity: 0; z-index: 30; width: min(92vw, 460px); background: #fff; border-radius: 14px; box-shadow: 0 10px 30px rgba(20, 30, 50, .28); border-left: 8px solid var(--tc, var(--navy)); padding: 11px 14px; display: flex; gap: 12px; align-items: center; transition: opacity .25s, transform .25s; pointer-events: none }
+.toast.show { opacity: 1; transform: translate(-50%, 0) }
+.toast .gi { font-size: 34px; color: var(--tc, var(--navy)) }
+.toast b { display: block; font-size: 16.5px }
+.toast span { font-size: 15px }
+.rain { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 40 }
+.rain .gi { position: absolute; top: -40px; animation: fall linear forwards }
+@keyframes fall { to { transform: translateY(110vh) rotate(var(--rot)) } }
+@keyframes pulse { 0%, 100% { opacity: .95 } 50% { opacity: .25 } }
+.token { transition: transform .22s ease }
+.token .ring { animation: pulse 1s ease-in-out infinite }
+.stone[data-stone] { cursor: pointer }
+@media (prefers-reduced-motion: reduce) { .token, .toast { transition: none } .token .ring { animation: none } }
+
+/* § Dialogs: rules and quitting */
+dialog { border: 0; border-radius: 18px; padding: 0; width: min(94vw, 640px); max-height: 88vh; box-shadow: 0 20px 60px rgba(0, 0, 0, .35); color: var(--ink) }
+dialog::backdrop { background: rgba(20, 30, 50, .55) }
+.dlg { padding: 18px 18px 16px; overflow-y: auto; max-height: 88vh }
+.dlg h2 { font: 900 21px var(--black); color: var(--navy); margin: 0 0 6px }
+.dlg h3 { font: 900 16px var(--black); color: var(--c, var(--navy)); margin: 16px 0 4px; display: flex; align-items: center; gap: 8px }
+.dlg h3 .gi { font-size: 22px }
+.dlg p, .dlg li { font-size: 15.5px; margin: 0 0 6px }
+.dlg ol, .dlg ul { margin: 0; padding-left: 22px }
+.dlg .close { display: flex; justify-content: flex-end; gap: 8px; margin: 14px -18px -16px; padding: 10px 18px 16px; position: sticky; bottom: -16px; background: #fff; border-top: 1px solid var(--line) }
+.legend { list-style: none; padding: 0 !important; margin: 0 }
+.legend li { display: flex; align-items: center; gap: 10px; margin-bottom: 6px }
+.legend .gi { font-size: 22px }
+.legend .d { margin-left: auto; min-width: 38px; text-align: center; border-radius: 999px; color: #fff; font: 900 13px var(--black); padding: 2px 8px }
+</style>
+</head>
+<body>
+
+<section id="setup" class="setup" hidden>
+  <div class="hero">
+    <img class="medal" src="img/centro.jpg" alt="Un melocotonero en las cuatro estaciones">
+    <div>
+      <h1><small>¡A POR LA</small>COSECHA!</h1>
+      <p>Un juego de preguntas para dar la vuelta al año de un frutal sin perder la fruta: del reposo del invierno a la fruta del final del verano.</p>
+      <div class="chips"><span>De 2 a 6 equipos</span><span>A partir de 12 años</span><span>Unos 15 minutos</span></div>
+    </div>
+  </div>
+
+  <div id="resume" class="box resume" hidden></div>
+
+  <form id="setupForm" class="box" autocomplete="off">
+    <h2>¿Cuántos equipos jugáis?</h2>
+    <div class="seg" id="segTeams" role="group" aria-label="Número de equipos"></div>
+    <div class="teamlist" id="teamList"></div>
+    <p class="help">Podéis cambiar el nombre de cada equipo tocándolo.</p>
+
+    <h2>Reloj</h2>
+    <div class="seg" id="segClock" role="group" aria-label="Reloj">
+      <button type="button" data-min="15" aria-pressed="true">15 minutos</button>
+      <button type="button" data-min="10" aria-pressed="false">10 minutos</button>
+      <button type="button" data-min="0" aria-pressed="false">Sin reloj</button>
+    </div>
+    <p class="help">Si suena y nadie ha llegado a la meta, gana quien vaya más lejos.</p>
+
+    <h2>¿Cuántas personas vais a jugar? <small>(si queréis)</small></h2>
+    <div class="stepper">
+      <button type="button" data-step="-1" aria-label="Una persona menos">−</button>
+      <input id="people" type="number" inputmode="numeric" min="1" max="200" placeholder="?" aria-label="Número de personas">
+      <button type="button" data-step="1" aria-label="Una persona más">+</button>
+    </div>
+    <p class="help">Nos ayuda a saber a cuánta gente llega el juego.</p>
+
+    <button class="primary go" type="submit">¡A jugar!</button>
+    <div class="links">
+      <button type="button" class="linkbtn" data-act="rules">Cómo se juega</button>
+      <a href="https://github.com/DanielGP121/a-por-la-cosecha">Versión para imprimir</a>
+    </div>
+  </form>
+
+  <footer class="credits">
+    <img src="img/eead_horizontal.png" alt="Estación Experimental de Aula Dei (EEAD-CSIC)">
+    <div><b>Juego de Daniel González Palazón</b>, Estación Experimental de Aula Dei (EEAD-CSIC). Semana de la Ciencia 2026.<br>
+      Ilustraciones generadas con la IA de Canva. Iconos de <a href="https://game-icons.net/">game-icons.net</a> (CC BY 3.0). Licencia <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es">CC BY-NC-SA 4.0</a>.
+      <span id="privacy" hidden><br>Contamos las partidas de forma anónima con GoatCounter: sin cookies y sin datos personales.</span></div>
+  </footer>
+</section>
+
+<div id="game" class="game" data-view="card" hidden>
+  <header class="bar">
+    <div class="brand"><img src="img/icono.png" alt=""><span>¡A por la cosecha!</span></div>
+    <div class="round" id="roundInfo"></div>
+    <button id="clock" class="clock" type="button" data-act="clock" aria-label="Pausar o seguir el reloj" hidden></button>
+    <button class="iconbtn" type="button" data-act="rules" aria-label="Cómo se juega">?</button>
+    <button class="iconbtn" type="button" data-act="quit" aria-label="Salir de la partida">✕</button>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button type="button" role="tab" data-act="view" data-view="card" aria-selected="true">Tarjeta</button>
+    <button type="button" role="tab" data-act="view" data-view="board" aria-selected="false">Tablero</button>
+  </nav>
+  <div class="stage">
+    <div class="boardWrap"><svg id="board" role="img" aria-label="Tablero: la vuelta al año de un frutal"></svg></div>
+    <div class="side">
+      <div class="panel" id="panel" aria-live="polite"></div>
+      <div class="actions" id="actions"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<dialog id="rulesDlg" aria-labelledby="rulesTitle">
+  <div class="dlg">
+    <h2 id="rulesTitle">Cómo se juega</h2>
+    <p>Un móvil, una tableta o un ordenador hace de tablero y de tarjetas. Quien lo maneja hace de árbitro.</p>
+    <h3 style="--c: var(--winter)">Todos a la vez</h3>
+    <ol>
+      <li>Todas las fichas empiezan en SALIDA.</li>
+      <li>Quien arbitra lee en voz alta la pregunta y las tres opciones. Los mazos van por orden: azul, rosa, verde y naranja, y vuelta a empezar.</li>
+      <li>Cada equipo lo habla en voz baja. A la de tres, todos levantan a la vez una paleta con su respuesta. Si no tenéis paletas, vale con uno, dos o tres dedos para la A, la B o la C.</li>
+      <li>Quien arbitra marca la letra de cada equipo y pulsa «Ver solución». Los equipos que aciertan avanzan lo que marca la tarjeta: 2, 3 o 4 casillas. Las de 4 son las más difíciles. Los que fallan se quedan donde están.</li>
+    </ol>
+    <h3 style="--c: #B8860B">Casillas especiales</h3>
+    <ul class="legend" id="legend"></ul>
+    <p>Ninguna casilla especial te deja en otra: siempre acabas en una normal. En el tablero, toca una casilla especial para ver qué hace.</p>
+    <h3 style="--c: var(--fruit)">Quién gana</h3>
+    <p>El primer equipo que completa la vuelta y vuelve a la casilla de SALIDA y META recoge la cosecha. No hace falta sacar el número justo. Si dos llegan con la misma pregunta, desempatan con una más, solo para ellos.</p>
+    <p><b>Reloj:</b> si suena y nadie ha llegado, gana quien vaya más lejos. Tocando el reloj se para y se vuelve a poner en marcha.</p>
+    <h3 style="--c: var(--spring)">Retos</h3>
+    <p>El equipo que cae en un reto hace la prueba en el momento. Si pide material que no tenéis, coged otra tarjeta. La solución de los retos queda tapada: solo la mira quien arbitra.</p>
+    <div class="close"><button class="primary" type="button" data-act="close">Entendido</button></div>
+  </div>
+</dialog>
+
+<dialog id="quitDlg" aria-labelledby="quitTitle">
+  <div class="dlg">
+    <h2 id="quitTitle">¿Salir de la partida?</h2>
+    <p>La partida se pierde y volvéis a la pantalla de inicio.</p>
+    <div class="close"><button class="btn" type="button" data-act="close">Seguir jugando</button><button class="primary" type="button" data-act="quit-yes">Salir</button></div>
+  </div>
+</dialog>
+
+<script src="datos.js"></script>
+<script src="juego.js"></script>
+</body>
+</html>

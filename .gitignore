@@ -5,3 +5,6 @@
 !README.md
 !LICENSE.md
 !0[1-5]_*.pdf
+# Browser version of the game, served by GitHub Pages from docs/ (page, script, data and light images)
+!docs/
+!docs/**
