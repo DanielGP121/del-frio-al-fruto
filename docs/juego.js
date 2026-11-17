@@ -118,6 +118,12 @@
   const svgIcon = (name, cx, cy, size, color, extra = "") => `<svg x="${f1(cx - size / 2)}" y="${f1(cy - size / 2)}" width="${size}" height="${size}" viewBox="0 0 512 512" fill="${hex(color)}" ${extra}>${D.icons[name]}</svg>`;
   // Special stones and their shapes are drawn by the printed board builder and arrive as SVG
   // centred on (0, 0): here they are only moved into place and, for the legends, scaled down
+  // "Flor con suerte" when the board builder names its shapes, plain "con suerte" otherwise
+  const stoneName = (good, cap) => {
+    const tail = good ? "con suerte" : "de mala pata", name = D.board.shapeNames && D.board.shapeNames[good ? "good" : "bad"];
+    const text = name ? `${name.toLowerCase()} ${tail}` : tail;
+    return cap ? text[0].toUpperCase() + text.slice(1) : text;
+  };
   const glyph = (good, cx, cy, s) => `<g transform="translate(${f1(cx)} ${f1(cy)}) scale(${f1(s)})">${D.board.shapes[good ? "good" : "bad"]}</g>`;
   // Game title on two lines, small then big, sized to fit its plaque whatever the name
   function titleSvg(cx, y1, y2, width, s1, s2, stroke) {
@@ -219,8 +225,8 @@
   function legendPlaque(x, y, w, h, size, credits) {
     const rows = [
       [(cx, cy) => `<circle cx="${cx}" cy="${cy}" r="${size * 0.8}" fill="${hex(C.reto)}"/>` + svgIcon("GiStarMedal", cx, cy, size * 1.15, C.navy), "Reto: supera la prueba y avanza 3"],
-      [(cx, cy) => glyph(true, cx, cy, size * 0.055), "Con suerte: avanza"],
-      [(cx, cy) => glyph(false, cx, cy, size * 0.055), "Mala pata: retrocede"],
+      [(cx, cy) => glyph(true, cx, cy, size * 0.055), `${stoneName(true, true)}: avanza`],
+      [(cx, cy) => glyph(false, cx, cy, size * 0.055), `${stoneName(false, true)}: retrocede`],
     ];
     const step = size * 1.75, top = y + size * 1.35;
     let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#FFFFFF" fill-opacity="0.88"/>`;
@@ -814,7 +820,7 @@
   const retoMini = `<circle r="14.5" fill="${hex(C.reto)}" stroke="#FFFFFF" stroke-width="1.6"/>` + svgIcon("GiStarMedal", 0, -2.4, 13.5, C.navy);
   $("#legend").innerHTML = [
     `<li>${mini(retoMini)}<span><b>Reto</b> (casilla amarilla con medalla): el equipo hace una prueba en el momento.</span><span class="d" style="background:#B8860B">+${D.board.retoReward}</span></li>`,
-    ...Object.entries(D.board.events).map(([k, ev]) => `<li>${mini(ev.svg)}<span><b>Casilla ${k}</b>, ${ev.delta > 0 ? "con suerte" : "de mala pata"}: ${esc(ev.text)}.</span><span class="d" style="background:${hex(ev.delta > 0 ? C.good : C.bad)}">${ev.delta > 0 ? "+" : "−"}${Math.abs(ev.delta)}</span></li>`),
+    ...Object.entries(D.board.events).map(([k, ev]) => `<li>${mini(ev.svg)}<span><b>Casilla ${k}</b>, ${stoneName(ev.delta > 0)}: ${esc(ev.text)}.</span><span class="d" style="background:${hex(ev.delta > 0 ? C.good : C.bad)}">${ev.delta > 0 ? "+" : "−"}${Math.abs(ev.delta)}</span></li>`),
   ].join("");
   counter.init();
   showSetup();
