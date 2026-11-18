@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Del frío al fruto</title>
-<meta name="description" content="Juego de preguntas para jugar en grupo desde el navegador: dad la vuelta al año de un frutal, del reposo del invierno a la fruta del final del verano. De 2 a 6 equipos, unos 15 minutos.">
+<meta name="description" content="Juego de preguntas para jugar en grupo desde el navegador, juntos o a distancia: dad la vuelta al año de un frutal, del reposo del invierno a la fruta del final del verano. De 2 a 6 equipos, unos 15 minutos.">
 <meta name="theme-color" content="#1E3A5F">
 <meta property="og:title" content="Del frío al fruto">
 <meta property="og:description" content="Juego de preguntas sobre el año de un frutal: reposo invernal, flores y polen, hojas y luz, y fruto. Para jugar en grupo desde el navegador.">
@@ -13,8 +13,9 @@
 <link rel="icon" type="image/png" href="img/icono.png">
 <link rel="apple-touch-icon" href="img/icono.png">
 <script>
-  // GoatCounter site code, set in _fuente/build_web.js (COUNTER_CODE). Empty means nothing is counted.
-  window.COUNTER_CODE = "";
+  // Set in _fuente/build_web.js. counter: GoatCounter site code (empty = nothing is counted).
+  // db: address of the Firebase Realtime Database that connects the devices of a room (empty = no rooms).
+  window.GAME_CONFIG = {"counter":"","db":"https://del-frio-al-fruto-default-rtdb.europe-west1.firebasedatabase.app"};
 </script>
 <style>
 :root {
@@ -244,6 +245,106 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
 .legend .gi { font-size: 22px }
 .legend .mini { width: 32px; height: 32px; flex: 0 0 auto }
 .legend .d { margin-left: auto; min-width: 38px; text-align: center; border-radius: 999px; color: #fff; font: 900 13px var(--black); padding: 2px 8px }
+
+/* § Speed button, 3D board and connection warning */
+.iconbtn.wide { width: auto; min-width: 46px; padding: 0 9px; font-size: 15px }
+.boardWrap { position: relative }
+.board3d { position: absolute; inset: 0; touch-action: none; cursor: grab }
+.board3d:active { cursor: grabbing }
+.board3d canvas { display: block; width: 100%; height: 100%; outline: none }
+.viewtoggle { position: absolute; right: 12px; bottom: 12px; z-index: 5; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255, 255, 255, .92); font-weight: 700; font-size: 14px; color: var(--navy); box-shadow: 0 2px 8px rgba(30, 58, 95, .15) }
+.viewtoggle.left { right: auto; left: 12px }
+.viewseg { position: absolute; right: 12px; bottom: 12px; z-index: 5; display: flex; padding: 3px; gap: 2px; border-radius: 12px; background: rgba(255, 255, 255, .92); border: 1px solid var(--line); box-shadow: 0 2px 8px rgba(30, 58, 95, .15) }
+.viewseg button { min-height: 32px; min-width: 52px; padding: 0 10px; border: 0; border-radius: 9px; background: transparent; font-weight: 800; font-size: 14px; color: var(--navy) }
+.viewseg button[aria-pressed="true"] { background: var(--navy); color: #fff }
+/* A soft vignette frames the valley like a diorama, without costing the graphics card anything */
+.board3d.world::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0) 58%, rgba(20, 30, 55, .26) 100%) }
+.netwarn { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); z-index: 35; background: #B71C1C; color: #fff; border-radius: 999px; padding: 6px 16px; font-weight: 700; font-size: 14px; box-shadow: 0 6px 18px rgba(0, 0, 0, .25); white-space: nowrap }
+
+/* § Rooms: joining, the lobby and answering on one's own device */
+.joinform { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.joinform input, .field { height: 46px; border: 2px solid var(--line); border-radius: 12px; padding: 0 12px; font: 700 17px var(--sans); min-width: 0; color: var(--ink) }
+.joinform #joinCode { width: 132px; text-transform: uppercase; letter-spacing: 3px; text-align: center }
+.joinform #joinName { flex: 1 1 150px }
+.field { width: min(100%, 320px) }
+.check { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; margin-top: 10px; font-weight: 600 }
+.check input { width: 22px; height: 22px }
+.check small { font-weight: 400; color: var(--muted) }
+.lobby .lead { margin: 0 0 10px; font-size: 16.5px }
+.roomcode { font: 900 52px/1 var(--black); letter-spacing: 8px; color: var(--navy); text-align: center; background: #FFF8E1; border: 3px dashed var(--reto); border-radius: 16px; padding: 14px 8px; margin-bottom: 12px; user-select: all }
+.joinrow { display: flex; gap: 14px; align-items: center; margin-bottom: 16px }
+.joinrow .qr { width: 128px; height: 128px; flex: 0 0 auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden }
+.joinrow .qr svg { width: 100%; height: 100%; display: block }
+.joinrow p { margin: 0 0 8px; font-size: 15px }
+.tokgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-bottom: 8px }
+.tokbtn { display: flex; align-items: center; gap: 9px; text-align: left; border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 8px 9px; min-height: 56px }
+.tokbtn.taken { background: #F7F4EE }
+.tokbtn.mine { border-color: var(--tc); box-shadow: 0 0 0 2px var(--tc) inset }
+.tokbtn .tk { min-width: 0; line-height: 1.15 }
+.tokbtn .tk b { display: block; font: 900 13.5px var(--black) }
+.tokbtn .tk small { color: var(--muted); font-size: 13px; overflow-wrap: anywhere }
+.tokbtn .off { opacity: .5; text-decoration: line-through }
+.card.tap .opts li { padding: 0; border: 0; background: none }
+.optbtn { display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left; border: 2px solid var(--line); border-radius: 12px; background: #fff; padding: 9px; font-size: 16.5px; line-height: 1.3 }
+.optbtn > b { flex: 0 0 30px; height: 30px; border-radius: 50%; background: var(--c); color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 900 15px var(--black) }
+.optbtn .txt { flex: 1; padding-top: 3px }
+.opts li.picked .optbtn { border-color: var(--c); background: var(--t); box-shadow: 0 0 0 2px var(--c) inset }
+.card > .forteam { padding-top: 10px }
+.qtimer { position: relative; height: 26px; border-radius: 13px; background: #ECE6DA; overflow: hidden; margin-bottom: 10px }
+.qtimer i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--reto); transition: width 1s linear }
+.qtimer span { position: relative; display: block; text-align: center; font: 800 15px/26px var(--sans); color: var(--navy); font-variant-numeric: tabular-nums }
+.vstat { font-weight: 800; color: var(--muted); white-space: nowrap }
+.vstat.on { color: var(--good) }
+.banner.zone { background: var(--c); color: #fff; font-size: 15px }
+.standings .nm small { display: block; font-weight: 400; font-size: 13px; color: var(--muted) }
+
+/* § Challenges at a distance: the inputs drawn by retos.js */
+.rx-text { width: 100%; border: 2px solid var(--line); border-radius: 12px; padding: 10px; font: 16px/1.35 var(--sans); resize: vertical; margin-top: 10px; color: var(--ink) }
+.rx-num { width: 120px; height: 52px; border: 2px solid var(--line); border-radius: 12px; text-align: center; font: 800 24px var(--sans); margin-top: 10px; color: var(--ink) }
+.rx-num.wide { flex: 1; width: auto; min-width: 0; font-size: 18px; text-align: left; padding: 0 12px; margin: 0 }
+.rx-guessbox { display: flex; gap: 8px; margin-top: 10px }
+.rx-send { width: 100%; margin-top: 10px }
+.rx-order { display: grid; gap: 8px; margin-top: 10px }
+.rx-item { display: flex; align-items: center; gap: 10px; min-height: 50px; border: 2px solid var(--line); border-radius: 12px; background: #fff; padding: 0 12px; font-weight: 700; text-align: left }
+.rx-item b { width: 30px; height: 30px; border-radius: 50%; border: 2px dashed #C9C0AE; display: inline-flex; align-items: center; justify-content: center; font: 900 15px var(--black); flex: 0 0 auto }
+.rx-item.on { border-color: var(--navy); background: #EEF2F6 }
+.rx-item.on b { background: var(--navy); border: 2px solid var(--navy); color: #fff }
+.rx-vflist { display: grid; gap: 8px; margin-top: 10px }
+.rx-vf { display: flex; align-items: center; gap: 10px; background: #F7F4EE; border-radius: 12px; padding: 8px 10px }
+.rx-vf > span:first-child { flex: 1 }
+.rx-vfb { display: flex; gap: 6px }
+.rx-vfb button { width: 46px; height: 46px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font: 900 17px var(--black); color: var(--navy) }
+.rx-vfb button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff }
+.rx-buds { display: block; width: 100%; max-width: 380px; margin: 8px auto 0 }
+.rx-bud { cursor: pointer }
+.rx-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px }
+.rx-slot { border: 2px solid var(--line); border-radius: 12px; background: #fff; padding: 6px 4px; min-height: 68px; display: flex; flex-direction: column; align-items: center; gap: 2px }
+.rx-slot small { font-size: 12px; font-weight: 700; color: var(--muted) }
+.rx-slot span { font-size: 26px; line-height: 1.2 }
+.rx-slot.on { border-color: var(--navy); background: #EEF2F6 }
+.rx-palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 8px }
+.rx-palette button { height: 46px; border-radius: 10px; border: 2px solid var(--line); background: #fff; font-size: 24px; line-height: 1; padding: 0 }
+.rx-draw canvas { display: block; width: 100%; aspect-ratio: 4 / 3; border: 2px dashed var(--navy); border-radius: 12px; background: #fff; touch-action: none; margin-top: 10px }
+.rx-drawing { display: block; width: 100%; border: 2px solid var(--line); border-radius: 12px; background: #fff }
+.rx-sub { margin-top: 12px }
+.rx-quote { margin: 0; background: #F7F4EE; border-left: 5px solid var(--reto); border-radius: 10px; padding: 10px 12px; font-size: 17px; overflow-wrap: anywhere }
+.rx-big { font: 900 44px/1 var(--black); text-align: center; color: var(--navy); padding: 6px 0 }
+.rx-olist { margin: 0; padding-left: 26px; font-size: 17px; font-weight: 700 }
+.rx-vfshow { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px }
+.rx-vfshow li { display: flex; gap: 10px; align-items: center }
+.rx-vfshow b { width: 34px; height: 34px; border-radius: 10px; background: #F1EEE7; display: inline-flex; align-items: center; justify-content: center; font: 900 16px var(--black); flex: 0 0 auto }
+.rx-vfshow b.ok { background: var(--good); color: #fff }
+.rx-vfshow b.ko { background: var(--bad); color: #fff }
+.rx-ans { margin: 8px 0 0; font-weight: 700 }
+.rx-none { color: var(--muted); font-style: italic }
+.rx-warn { color: var(--bad); font-weight: 700; margin: 6px 0 0 }
+.rx-result { font: 900 19px var(--black); text-align: center; margin: 12px 0 0 }
+.rx-result.ok { color: var(--good) }
+.rx-result.ko { color: var(--bad) }
+.rx-clue { background: #FFF8E1; border: 2px dashed var(--reto); border-radius: 12px; padding: 8px 12px; margin-top: 8px }
+.rx-clue small { font-weight: 700; color: var(--muted) }
+.rx-clue p { margin: 2px 0 0; font-size: 18px; font-weight: 700; overflow-wrap: anywhere }
+.sol.plain { border-radius: 12px; border: 0; margin-top: 12px; background: #FFF3CC }
 </style>
 </head>
 <body>
@@ -260,11 +361,53 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
 
   <div id="resume" class="box resume" hidden></div>
 
+  <div id="joinBox" class="box" hidden>
+    <h2>¿Te han dado un código de sala?</h2>
+    <form id="joinForm" class="joinform" autocomplete="off">
+      <input id="joinCode" type="text" maxlength="5" placeholder="CÓDIGO" aria-label="Código de la sala" autocapitalize="characters">
+      <input id="joinName" type="text" maxlength="16" placeholder="Tu nombre" aria-label="Tu nombre">
+      <button class="btn good" type="submit">Entrar</button>
+    </form>
+    <p id="joinMsg" class="help" role="status" hidden></p>
+  </div>
+
   <form id="setupForm" class="box" autocomplete="off">
-    <h2>¿Cuántos equipos jugáis?</h2>
-    <div class="seg" id="segTeams" role="group" aria-label="Número de equipos"></div>
-    <div class="teamlist" id="teamList"></div>
-    <p class="help">Podéis cambiar el nombre de cada equipo tocándolo.</p>
+    <h2>¿Cómo jugáis?</h2>
+    <div class="seg" id="segPlace" role="group" aria-label="Dónde están los jugadores">
+      <button type="button" data-place="juntos" aria-pressed="true">Juntos, en el mismo sitio</button>
+      <button type="button" data-place="distancia" aria-pressed="false">A distancia</button>
+    </div>
+    <p class="help" id="placeHelp"></p>
+
+    <div id="devicesWrap" hidden>
+      <h2>¿Con cuántos dispositivos?</h2>
+      <div class="seg" id="segDevices" role="group" aria-label="Número de dispositivos">
+        <button type="button" data-devices="uno" aria-pressed="true">Uno para todos</button>
+        <button type="button" data-devices="sala" aria-pressed="false">Cada uno con el suyo</button>
+      </div>
+      <p class="help">Con uno, quien lo maneja hace de árbitro. Con varios se crea una sala, y cada jugador entra con un código desde su móvil o su ordenador.</p>
+    </div>
+
+    <div id="blockTeams">
+      <h2>¿Cuántos equipos jugáis?</h2>
+      <div class="seg" id="segTeams" role="group" aria-label="Número de equipos"></div>
+      <div class="teamlist" id="teamList"></div>
+      <p class="help">Podéis cambiar el nombre de cada equipo tocándolo.</p>
+    </div>
+
+    <div id="blockRoom" hidden>
+      <h2>Tu nombre</h2>
+      <input id="hostName" class="field" type="text" maxlength="16" placeholder="Cómo te llamas" aria-label="Tu nombre">
+      <label class="check"><input id="hostPlays" type="checkbox" checked> Yo también juego <small>(desmárcalo si este dispositivo solo hace de pantalla)</small></label>
+      <h2>Tiempo para contestar</h2>
+      <div class="seg" id="segQsecs" role="group" aria-label="Tiempo para contestar cada pregunta">
+        <button type="button" data-secs="30" aria-pressed="false">30 segundos</button>
+        <button type="button" data-secs="45" aria-pressed="true">45 segundos</button>
+        <button type="button" data-secs="60" aria-pressed="false">60 segundos</button>
+        <button type="button" data-secs="0" aria-pressed="false">Sin límite</button>
+      </div>
+      <p class="help">Las fichas y los nombres se eligen dentro de la sala. Quien crea la sala lleva el ritmo de la partida.</p>
+    </div>
 
     <h2>Reloj</h2>
     <div class="seg" id="segClock" role="group" aria-label="Reloj">
@@ -274,15 +417,17 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
     </div>
     <p class="help">Si suena y nadie ha llegado a la meta, gana quien vaya más lejos.</p>
 
-    <h2>¿Cuántas personas vais a jugar? <small>(si queréis)</small></h2>
-    <div class="stepper">
-      <button type="button" data-step="-1" aria-label="Una persona menos">−</button>
-      <input id="people" type="number" inputmode="numeric" min="1" max="200" placeholder="?" aria-label="Número de personas">
-      <button type="button" data-step="1" aria-label="Una persona más">+</button>
+    <div id="blockPeople">
+      <h2>¿Cuántas personas vais a jugar? <small>(si queréis)</small></h2>
+      <div class="stepper">
+        <button type="button" data-step="-1" aria-label="Una persona menos">−</button>
+        <input id="people" type="number" inputmode="numeric" min="1" max="200" placeholder="?" aria-label="Número de personas">
+        <button type="button" data-step="1" aria-label="Una persona más">+</button>
+      </div>
+      <p class="help">Nos ayuda a saber a cuánta gente llega el juego.</p>
     </div>
-    <p class="help">Nos ayuda a saber a cuánta gente llega el juego.</p>
 
-    <button class="primary go" type="submit">¡A jugar!</button>
+    <button class="primary go" id="goBtn" type="submit">¡A jugar!</button>
     <div class="links">
       <button type="button" class="linkbtn" data-act="rules">Cómo se juega</button>
       <a href="https://github.com/DanielGP121/del-frio-al-fruto">Versión para imprimir</a>
@@ -292,7 +437,7 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
   <footer class="credits">
     <img src="img/eead_horizontal.png" alt="Estación Experimental de Aula Dei (EEAD-CSIC)">
     <div><b>Juego de Daniel González Palazón</b>, Estación Experimental de Aula Dei (EEAD-CSIC). Semana de la Ciencia 2026.<br>
-      Ilustraciones generadas con la IA de Canva. Iconos de <a href="https://game-icons.net/">game-icons.net</a> (CC BY 3.0). Licencia <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es">CC BY-NC-SA 4.0</a>.
+      Ilustraciones generadas con la IA de Canva. Iconos de <a href="https://game-icons.net/">game-icons.net</a> (CC BY 3.0). Mundo en 3D con <a href="https://threejs.org/">three.js</a> (MIT). Licencia <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es">CC BY-NC-SA 4.0</a>.
       <span id="privacy" hidden><br>Contamos las partidas de forma anónima con GoatCounter: sin cookies y sin datos personales.</span></div>
   </footer>
 </section>
@@ -302,6 +447,7 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
     <div class="brand"><img src="img/icono.png" alt=""><span>Del frío al fruto</span></div>
     <div class="round" id="roundInfo"></div>
     <button id="clock" class="clock" type="button" data-act="clock" aria-label="Pausar o seguir el reloj" hidden></button>
+    <button id="speed" class="iconbtn wide" type="button" data-act="speed" aria-label="Velocidad de las fichas">×1</button>
     <button class="iconbtn" type="button" data-act="rules" aria-label="Cómo se juega">?</button>
     <button class="iconbtn" type="button" data-act="quit" aria-label="Salir de la partida">✕</button>
   </header>
@@ -310,7 +456,17 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
     <button type="button" role="tab" data-act="view" data-view="board" aria-selected="false">Tablero</button>
   </nav>
   <div class="stage">
-    <div class="boardWrap"><svg id="board" role="img" aria-label="Tablero: la vuelta al año de un frutal"></svg></div>
+    <div class="boardWrap">
+      <svg id="board" role="img" aria-label="Tablero: la vuelta al año de un frutal"></svg>
+      <div id="board3d" class="board3d world" role="img" aria-label="Valle en tres dimensiones: la vuelta al año de un frutal" hidden></div>
+      <div id="boardBasic" class="board3d" role="img" aria-label="Tablero impreso en tres dimensiones, sobre una mesa" hidden></div>
+      <button id="camToggle" class="viewtoggle left" type="button" data-act="cam-view" hidden>Ver el valle entero</button>
+      <div id="viewSeg" class="viewseg" role="group" aria-label="Cómo ver el tablero" hidden>
+        <button type="button" data-act="board" data-board="mundo" aria-pressed="true">Mundo</button>
+        <button type="button" data-act="board" data-board="basico" aria-pressed="false">3D</button>
+        <button type="button" data-act="board" data-board="2d" aria-pressed="false">2D</button>
+      </div>
+    </div>
     <div class="side">
       <div class="panel" id="panel" aria-live="polite"></div>
       <div class="actions" id="actions"></div>
@@ -319,26 +475,30 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
 </div>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="netwarn" class="netwarn" role="status" hidden></div>
 
 <dialog id="rulesDlg" aria-labelledby="rulesTitle">
   <div class="dlg">
     <h2 id="rulesTitle">Cómo se juega</h2>
-    <p>Un móvil, una tableta o un ordenador hace de tablero y de tarjetas. Quien lo maneja hace de árbitro.</p>
-    <h3 style="--c: var(--winter)">Todos a la vez</h3>
+    <p>Se puede jugar con un solo dispositivo, que hace de tablero y de tarjetas mientras quien lo maneja arbitra, o en una sala, con un dispositivo por jugador.</p>
+    <h3 style="--c: var(--winter)">Cada ronda</h3>
     <ol>
       <li>Todas las fichas empiezan en SALIDA.</li>
-      <li>Quien arbitra lee en voz alta la pregunta y las tres opciones. Los mazos van por orden: azul, rosa, verde y naranja, y vuelta a empezar.</li>
-      <li>Cada equipo lo habla en voz baja. A la de tres, todos levantan a la vez una paleta con su respuesta. Si no tenéis paletas, vale con uno, dos o tres dedos para la A, la B o la C.</li>
-      <li>Quien arbitra marca la letra de cada equipo y pulsa «Ver solución». Los equipos que aciertan avanzan lo que marca la tarjeta: 2, 3 o 4 casillas. Las de 4 son las más difíciles. Los que fallan se quedan donde están.</li>
+      <li>Cada ficha contesta una pregunta del mazo de la zona donde está: azul en invierno, rosa en primavera, verde en verano y naranja al final del verano. Las fichas que comparten zona comparten pregunta.</li>
+      <li>Con un dispositivo, quien arbitra lee la pregunta y, a la de tres, cada equipo levanta su paleta. Si no tenéis paletas, vale con uno, dos o tres dedos para la A, la B o la C. En una sala, cada jugador toca su respuesta en su pantalla; si varios comparten ficha, cuenta la más votada.</li>
+      <li>Quien acierta avanza lo que marca la tarjeta: 2, 3 o 4 casillas. Las de 4 son las más difíciles. Quien falla se queda donde está.</li>
     </ol>
     <h3 style="--c: #B8860B">Casillas especiales</h3>
     <ul class="legend" id="legend"></ul>
     <p>Ninguna casilla especial te deja en otra: siempre acabas en una normal. En el tablero, toca una casilla especial para ver qué hace.</p>
     <h3 style="--c: var(--fruit)">Quién gana</h3>
-    <p>El primer equipo que completa la vuelta y vuelve a la casilla de SALIDA y META recoge la cosecha. No hace falta sacar el número justo. Si dos llegan con la misma pregunta, desempatan con una más, solo para ellos.</p>
+    <p>La primera ficha que completa la vuelta y vuelve a la casilla de SALIDA y META recoge la cosecha. No hace falta sacar el número justo. Si dos llegan en la misma ronda, desempatan con una pregunta más, solo para ellas.</p>
     <p><b>Reloj:</b> si suena y nadie ha llegado, gana quien vaya más lejos. Tocando el reloj se para y se vuelve a poner en marcha.</p>
     <h3 style="--c: var(--spring)">Retos</h3>
-    <p>El equipo que cae en un reto hace la prueba en el momento. Si pide material que no tenéis, coged otra tarjeta. La solución de los retos queda tapada: solo la mira quien arbitra.</p>
+    <p>Quien cae en un reto hace la prueba en el momento. Jugando juntos se hace en persona y decide quien arbitra; si pide material que no tenéis, coged otra tarjeta. A distancia, en una sala, la prueba se hace en la pantalla: unas se corrigen solas y otras las decide quien creó la sala.</p>
+    <h3 style="--c: var(--summer)">Velocidad y tablero</h3>
+    <p>El botón ×1 de arriba cambia la velocidad de las fichas (×1,5 o ×2) o se salta la animación.</p>
+    <p>Abajo a la derecha se elige cómo ver el tablero. <b>Mundo</b> es un valle entre montañas con las cuatro estaciones: la cámara camina detrás de las fichas y el árbol del centro, el cielo y el tiempo cambian con la estación. <b>3D</b> es el tablero impreso sobre una mesa. <b>2D</b> es el tablero plano, que en el móvil se pone en vertical. En las vistas 3D se gira arrastrando, se acerca con la rueda o con dos dedos, y con doble toque se vuelve a la vista inicial.</p>
     <div class="close"><button class="primary" type="button" data-act="close">Entendido</button></div>
   </div>
 </dialog>
@@ -346,12 +506,14 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
 <dialog id="quitDlg" aria-labelledby="quitTitle">
   <div class="dlg">
     <h2 id="quitTitle">¿Salir de la partida?</h2>
-    <p>La partida se pierde y volvéis a la pantalla de inicio.</p>
+    <p id="quitText">La partida se pierde y volvéis a la pantalla de inicio.</p>
     <div class="close"><button class="btn" type="button" data-act="close">Seguir jugando</button><button class="primary" type="button" data-act="quit-yes">Salir</button></div>
   </div>
 </dialog>
 
 <script src="datos.js"></script>
+<script src="sala.js"></script>
+<script src="retos.js"></script>
 <script src="juego.js"></script>
 </body>
 </html>

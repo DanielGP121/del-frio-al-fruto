@@ -17,3 +17,4 @@ Puedes compartir y adaptar el material siempre que:
 
 - Los logotipos de la Estación Experimental de Aula Dei (EEAD-CSIC) son propiedad de la institución y no se incluyen en esta licencia.
 - Los iconos proceden de [game-icons.net](https://game-icons.net/) y se distribuyen con licencia [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+- La versión para el navegador (`docs/`) incluye en `docs/vendor/` las bibliotecas [three.js](https://threejs.org/) y [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator), que conservan su licencia MIT.
