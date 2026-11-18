@@ -5,30 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Del frío al fruto</title>
 <meta name="description" content="Juego de preguntas para jugar en grupo desde el navegador, juntos o a distancia: dad la vuelta al año de un frutal, del reposo del invierno a la fruta del final del verano. De 2 a 6 equipos, unos 15 minutos.">
-<meta name="theme-color" content="#1E3A5F">
+<meta name="theme-color" content="#2A1E4A">
 <meta property="og:title" content="Del frío al fruto">
 <meta property="og:description" content="Juego de preguntas sobre el año de un frutal: reposo invernal, flores y polen, hojas y luz, y fruto. Para jugar en grupo desde el navegador.">
-<meta property="og:image" content="https://danielgp121.github.io/del-frio-al-fruto/img/centro.jpg">
+<meta property="og:image" content="https://danielgp121.github.io/del-frio-al-fruto/img/portada.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:url" content="https://danielgp121.github.io/del-frio-al-fruto/">
-<link rel="icon" type="image/png" href="img/icono.png">
-<link rel="apple-touch-icon" href="img/icono.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="180x180" href="img/logo_icono.png">
+<link rel="icon" type="image/svg+xml" href="img/logo_icono.svg">
+<link rel="apple-touch-icon" href="img/logo_icono.png">
+<link rel="preload" href="fonts/luckiest-guy-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
 <script>
   // Set in _fuente/build_web.js. counter: GoatCounter site code (empty = nothing is counted).
   // db: address of the Firebase Realtime Database that connects the devices of a room (empty = no rooms).
-  window.GAME_CONFIG = {"counter":"","db":"https://del-frio-al-fruto-default-rtdb.europe-west1.firebasedatabase.app","v":"ef39afbfed"};
+  window.GAME_CONFIG = {"counter":"","db":"https://del-frio-al-fruto-default-rtdb.europe-west1.firebasedatabase.app","v":"afb467b5d9"};
+  // ?foto shows only the title over the valley, filling the window: build_web.js takes the
+  // picture for social networks (img/portada.jpg) this way
+  if (/[?&]foto\b/.test(location.search)) document.documentElement.classList.add("foto");
 </script>
 <style>
+/* Both fonts live in fonts/ (Luckiest Guy, Apache 2.0; Nunito, SIL OFL 1.1), so the page asks nothing of other servers */
+@font-face { font-family: "Luckiest Guy"; src: url(fonts/luckiest-guy-latin.woff2) format("woff2"); font-weight: 400; font-style: normal; font-display: swap }
+@font-face { font-family: "Nunito"; src: url(fonts/nunito-latin.woff2) format("woff2"); font-weight: 400 900; font-style: normal; font-display: swap }
 :root {
-  --navy: #1E3A5F; --ink: #1B2A41; --muted: #5B6878; --paper: #FBF6EC; --line: #E4DCCB;
+  /* --navy is now the indigo of the logo outline (header bar, buttons, headings). The four season
+     colours and --reto are those of the printed cards and board, and stay as they are. */
+  --navy: #2A1E4A; --ink: #2B2340; --muted: #625B76; --paper: #FFF7EE; --line: #EADFD0;
   --winter: #1F6FA8; --spring: #D81B60; --summer: #2E7D4F; --fruit: #EF8A17; --reto: #F9B000;
   --good: #2E7D4F; --bad: #C62828;
-  --black: "Arial Black", "Segoe UI Black", "Helvetica Neue", Arial, system-ui, sans-serif;
-  --sans: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ice: #3B82F6; --peach: #FF7A1F; --sun: #FFC21A;
+  /* Luckiest Guy only has one weight: it goes with weight 400 so no browser fakes a bold */
+  --display: "Luckiest Guy", "Arial Black", Impact, system-ui, sans-serif;
+  --black: "Nunito", "Arial Black", "Segoe UI Black", system-ui, sans-serif;
+  --sans: "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
   --radius: 14px;
 }
 * { box-sizing: border-box }
 html, body { margin: 0; height: 100% }
-body { background: var(--paper); color: var(--ink); font: 16px/1.42 var(--sans); -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100% }
+body { background: var(--paper); color: var(--ink); font: 500 16px/1.45 var(--sans); -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100% }
 button { font: inherit; color: inherit; cursor: pointer }
 button:disabled { cursor: default }
 a { color: var(--winter) }
@@ -36,34 +53,62 @@ a { color: var(--winter) }
 [hidden] { display: none !important }
 .gi { width: 1em; height: 1em; fill: currentColor; flex: 0 0 auto }
 
-/* § Setup screen */
-.setup { max-width: 760px; margin: 0 auto; padding: 18px 16px 28px }
-.hero { display: flex; align-items: center; gap: 18px; padding: 6px 0 14px }
-.hero .medal { width: 132px; height: 132px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 0 2px var(--navy), 0 6px 18px rgba(30, 58, 95, .25); flex: 0 0 auto; object-fit: cover }
-.hero h1 { margin: 0; overflow-wrap: anywhere; font: 900 44px/0.95 var(--black); color: var(--fruit); -webkit-text-stroke: 1.2px var(--navy); paint-order: stroke fill; letter-spacing: .5px }
-.hero h1 small { display: block; font-size: 22px; color: var(--navy); -webkit-text-stroke: 0; margin-bottom: 4px }
-.hero p { margin: 8px 0 0; font-size: 16px }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px }
-.hero > div { min-width: 0 }
+/* § Setup screen: the title over the valley scene drawn by portada.js, then the forms, which
+   climb a little over the bottom of the scene */
+/* Below the hero, a faint scatter of the four seasons (snowflake, blossom, leaf and peach) */
+.setup { min-height: 100vh; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg opacity='.2'%3E%3Cpath d='M40 38v24M29.6 44l20.8 12M29.6 56l20.8-12' stroke='%233B82F6' stroke-width='3' stroke-linecap='round'/%3E%3Cg fill='%23FF6FA0'%3E%3Ccircle cx='172' cy='34' r='5'/%3E%3Ccircle cx='177.7' cy='38.1' r='5'/%3E%3Ccircle cx='175.5' cy='44.9' r='5'/%3E%3Ccircle cx='168.5' cy='44.9' r='5'/%3E%3Ccircle cx='166.3' cy='38.1' r='5'/%3E%3C/g%3E%3Cellipse cx='110' cy='148' rx='12' ry='5.5' fill='%2322A653' transform='rotate(-32 110 148)'/%3E%3Ccircle cx='222' cy='196' r='10' fill='%23FF7A1F'/%3E%3Cellipse cx='229' cy='184' rx='6' ry='3' fill='%2322A653' transform='rotate(-25 229 184)'/%3E%3Cpath d='M58 212v14M51.9 215.5l12.2 7M51.9 222.5l12.2-7' stroke='%233B82F6' stroke-width='2.5' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") repeat, linear-gradient(180deg, #FFF7EE 0, #FFF2E4 100%) }
+.hero { position: relative; overflow: hidden; text-align: center; padding: calc(44px + env(safe-area-inset-top)) 16px 200px;
+  background: linear-gradient(90deg, rgba(110, 150, 255, .30), rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0) 60%, rgba(255, 168, 86, .32)),
+    linear-gradient(180deg, #86CFFF 0%, #C4EAFF 58%, #FFF1DE 100%) }
+.hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 30px; background: linear-gradient(rgba(255, 247, 238, 0), #FFF7EE); pointer-events: none }
+.scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none }
+.scene .rays { animation: spin 70s linear infinite }
+.scene .cloud { animation: sway var(--d) ease-in-out infinite alternate }
+.scene .p { transform-box: fill-box; transform-origin: center; animation: drift-down linear infinite }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes sway { to { transform: translateX(var(--dx)) } }
+@keyframes drift-down { from { transform: translate(0, 0) rotate(0) } to { transform: translate(var(--dx), var(--fy)) rotate(var(--rot)) } }
+@media (prefers-reduced-motion: reduce) { .scene .rays, .scene .cloud { animation: none } .scene .fall { display: none } }
+.hero-in { position: relative; z-index: 1; max-width: 760px; margin: 0 auto }
+/* Title: built by logo.js. Each letter leans a little (--r) and carries the indigo outline and
+   drop of the logo; the O of FRUTO is the peach, drawn 176 units to the em (see logo.js) */
+.wordmark { margin: 0; font: 400 clamp(42px, 10vw, 80px)/0.95 var(--display); letter-spacing: .02em; color: var(--ice) }
+.wordmark .wl { display: block; white-space: nowrap }
+.wordmark .wl2 { color: var(--peach); font-size: 1.2em; margin-top: .02em }
+.wordmark .l { display: inline-block; position: relative; transform: rotate(var(--r)); -webkit-text-stroke: .12em var(--navy); paint-order: stroke fill; text-shadow: 0 .1em 0 var(--navy) }
+.wordmark .sp { display: inline-block; width: .3em }
+.wordmark .flake { position: absolute; left: 50%; top: -.33em; width: .48em; height: .48em; transform: translateX(-50%) rotate(8deg); overflow: visible }
+.wordmark .peach-o { display: inline-block; width: .824em; height: 1.074em; vertical-align: -.2em; margin-left: .03em; overflow: visible }
+.tagline { margin: 18px auto 0; max-width: 33em; font-size: clamp(15.5px, 2.2vw, 18px); line-height: 1.4; font-weight: 800; color: var(--navy) }
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px }
+.chips span { border-radius: 999px; padding: 5px 14px; font-size: 14px; font-weight: 800; box-shadow: 0 2px 0 rgba(42, 30, 74, .14) }
+.chips span:nth-child(1) { background: #E1EDFF; color: #1E4FC2 }
+.chips span:nth-child(2) { background: #FFE2EE; color: #A3124A }
+.chips span:nth-child(3) { background: #FFE9D2; color: #A2430B }
+.setup-main { position: relative; z-index: 2; max-width: 760px; margin: -56px auto 0; padding: 0 16px 30px }
 @media (max-width: 560px) {
-  .hero { flex-direction: column; text-align: center; gap: 12px }
-  .hero .medal { width: 116px; height: 116px }
-  .hero h1 { font-size: 40px }
-  .chips { justify-content: center }
+  .hero { padding-bottom: 156px }
+  .setup-main { margin-top: -44px }
   .credits { flex-direction: column; align-items: flex-start }
   .bar .deckname { display: none }
 }
-.chips span { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; font-size: 13.5px; font-weight: 600; color: var(--navy) }
-.box { background: #fff; border-radius: var(--radius); box-shadow: 0 1px 0 var(--line), 0 4px 16px rgba(30, 58, 95, .07); padding: 16px 16px 18px; margin-top: 14px }
-.box h2 { font: 900 17px/1.2 var(--black); color: var(--navy); margin: 16px 0 8px }
-.box h2:first-child { margin-top: 0 }
-.box h2 small { font: 400 14px var(--sans); color: var(--muted) }
+/* The picture for social networks: the hero alone, filling the window */
+.foto .setup-main { display: none }
+.foto .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding-bottom: 170px }
+.box { background: #fff; border-radius: 20px; box-shadow: 0 2px 0 rgba(42, 30, 74, .06), 0 12px 32px rgba(42, 30, 74, .11); padding: 18px 18px 20px; margin-top: 16px }
+.box h2 { font: 400 20px/1.15 var(--display); letter-spacing: .03em; color: var(--navy); margin: 20px 0 9px }
+.box > h2:first-child { margin-top: 0 }
+.box h2 small { font: 600 14px var(--sans); letter-spacing: 0; color: var(--muted) }
+/* The main form opens with a strip in the four colours of the board */
+#setupForm { position: relative; overflow: hidden; padding-top: 26px }
+#setupForm::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: linear-gradient(90deg, var(--winter) 0 25%, var(--spring) 25% 50%, var(--summer) 50% 75%, var(--fruit) 75%) }
 .help { color: var(--muted); font-size: 14px; margin: 6px 0 0 }
 .resume { border: 2px solid var(--reto); background: #FFF8E1 }
 .resume p { margin: 0 0 10px }
 .seg { display: inline-flex; flex-wrap: wrap; gap: 6px }
-.seg button { min-width: 50px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font-weight: 700 }
-.seg button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff }
+.seg button { min-width: 50px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font-weight: 800 }
+.seg button:hover:not([aria-pressed="true"]) { border-color: #CFC2EA; background: #FBF8FF }
+.seg button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 3px 0 #160F2B }
 .teamlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-top: 10px }
 .teamrow { display: flex; align-items: center; gap: 8px; background: #F7F4EE; border-radius: 12px; padding: 6px 8px }
 .teamrow input { flex: 1; min-width: 0; font: 800 16px var(--sans); text-transform: uppercase; border: 1px solid transparent; background: transparent; border-radius: 8px; padding: 7px 6px; color: var(--ink) }
@@ -75,16 +120,21 @@ a { color: var(--winter) }
 .stepper button { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font-size: 22px; font-weight: 700; line-height: 1 }
 .stepper input { width: 84px; height: 44px; text-align: center; font: 700 18px var(--sans); border: 2px solid var(--line); border-radius: 12px; -moz-appearance: textfield }
 .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0 }
-.go { display: block; width: 100%; margin-top: 20px }
+.go { display: block; width: 100%; margin-top: 24px }
+/* The big start button, a sticker like the title: sun yellow with the indigo outline */
+.primary.go { min-height: 64px; background: var(--sun); color: var(--navy); border: 3px solid var(--navy); border-radius: 18px; font: 400 27px var(--display); letter-spacing: .05em; box-shadow: 0 6px 0 var(--navy); transition: background .15s }
+.primary.go:hover:not(:disabled) { background: #FFD24A }
+.primary.go:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 var(--navy) }
+.primary.go:disabled { background: #E9E4F0; color: #8E86A3; border-color: #C9C1DA; box-shadow: 0 6px 0 #C9C1DA }
 .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin: 14px 0 0; font-size: 15px }
 .linkbtn { background: none; border: 0; padding: 4px; color: var(--winter); text-decoration: underline; text-underline-offset: 2px }
-.credits { display: flex; align-items: center; gap: 14px; margin-top: 22px; color: var(--muted); font-size: 13px; line-height: 1.45 }
+.credits { display: flex; align-items: center; gap: 14px; margin-top: 24px; padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, .6); color: var(--muted); font-size: 13px; line-height: 1.45 }
 .credits img { height: 46px; width: auto; flex: 0 0 auto }
 .credits b { color: var(--navy) }
 
 /* § Buttons */
-.primary { min-height: 52px; border: 0; border-radius: 14px; background: var(--navy); color: #fff; font: 900 18px var(--black); letter-spacing: .3px; padding: 0 18px; box-shadow: 0 3px 0 #10243d; display: inline-flex; align-items: center; justify-content: center; gap: 10px }
-.primary:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #10243d }
+.primary { min-height: 52px; border: 0; border-radius: 14px; background: var(--navy); color: #fff; font: 400 19px var(--display); letter-spacing: .05em; padding: 0 18px; box-shadow: 0 3px 0 #160F2B; display: inline-flex; align-items: center; justify-content: center; gap: 10px }
+.primary:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #160F2B }
 .primary:disabled { background: #AEB7C2; box-shadow: none }
 .primary .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--dc); box-shadow: 0 0 0 2px #fff }
 .btn { min-height: 48px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font-weight: 700; padding: 0 14px }
@@ -94,8 +144,8 @@ a { color: var(--winter) }
 /* § Game layout: header, tabs (narrow screens), board and side panel */
 .game { height: 100vh; height: 100dvh; display: flex; flex-direction: column }
 .bar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; padding-top: max(8px, env(safe-area-inset-top)); background: var(--navy); color: #fff; flex: 0 0 auto }
-.bar .brand { display: flex; align-items: center; gap: 8px; font: 900 17px var(--black); color: var(--reto); white-space: nowrap; min-width: 0 }
-.bar .brand img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff }
+.bar .brand { display: flex; align-items: center; gap: 8px; font: 400 19px var(--display); letter-spacing: .04em; color: var(--sun); white-space: nowrap; min-width: 0 }
+.bar .brand svg { width: 30px; height: 36px; flex: 0 0 auto }
 .bar .round { flex: 1; min-width: 0; font-size: 14px; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right }
 .clock { min-width: 82px; height: 38px; border-radius: 10px; border: 0; background: rgba(255, 255, 255, .14); color: #fff; font: 800 17px var(--sans); font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; justify-content: center; gap: 6px }
 .clock.paused { background: rgba(255, 255, 255, .3) }
@@ -135,7 +185,7 @@ a { color: var(--winter) }
 .card > header { background: var(--c); color: var(--ink2, #fff); display: flex; align-items: center; gap: 9px; padding: 8px 12px }
 .card > header .ic { width: 34px; height: 34px; border-radius: 50%; background: #fff; color: var(--c); display: inline-flex; align-items: center; justify-content: center; font-size: 23px }
 .card.reto > header .ic { color: var(--navy) }
-.card > header .cat { flex: 1; font: 900 17px/1 var(--black) }
+.card > header .cat { flex: 1; font: 400 18px/1 var(--display); letter-spacing: .04em }
 .card > header .code { font-size: 13px; opacity: .9 }
 .card .q { font-weight: 700; font-size: 19px; line-height: 1.3; margin: 0; padding: 14px 14px 10px }
 .opts { list-style: none; margin: 0; padding: 0 12px 4px; display: flex; flex-direction: column; gap: 8px }
@@ -174,9 +224,9 @@ a { color: var(--winter) }
 
 /* § Challenge extras: who plays, countdown, secret card */
 .forteam { display: flex; align-items: center; gap: 8px; padding: 12px 14px 0; font-size: 16px }
-.rt { font: 900 22px/1.15 var(--black); color: var(--navy); margin: 0; padding: 8px 14px 0 }
+.rt { font: 400 23px/1.15 var(--display); letter-spacing: .03em; color: var(--navy); margin: 0; padding: 8px 14px 0 }
 .timerbox { padding: 4px 14px 10px }
-.timerbox .count { font: 900 46px/1 var(--black); color: var(--navy); font-variant-numeric: tabular-nums; text-align: center; padding: 6px 0 }
+.timerbox .count { font: 400 48px/1 var(--display); color: var(--navy); font-variant-numeric: tabular-nums; text-align: center; padding: 6px 0 }
 .timerbox .count.done { color: var(--bad) }
 .cover { margin: 8px 14px 12px; border: 2px dashed var(--navy); border-radius: 12px; padding: 18px 14px; text-align: center; background: #F4F6F9 }
 .cover p { margin: 0 0 12px }
@@ -189,7 +239,7 @@ a { color: var(--winter) }
 .whobtns .btn { display: inline-flex; align-items: center; gap: 8px }
 
 /* § Between questions: what happened and the standings */
-.panel h2 { font: 900 19px/1.2 var(--black); color: var(--navy); margin: 0 0 10px }
+.panel h2 { font: 400 21px/1.2 var(--display); letter-spacing: .03em; color: var(--navy); margin: 0 0 10px }
 .log { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 6px }
 .log li { background: #F7F4EE; border-radius: 10px; padding: 7px 10px; font-size: 15px; display: flex; gap: 8px; align-items: center }
 .log li .gi { font-size: 20px }
@@ -206,10 +256,10 @@ a { color: var(--winter) }
 .win h2 { font-size: 24px; margin: 8px 0 6px }
 .win .why { margin: 0 0 14px; color: var(--muted) }
 .diploma { border: 4px solid var(--navy); outline: 2px solid var(--reto); outline-offset: -9px; border-radius: 14px; padding: 18px 18px 16px; margin: 0 0 18px; background: #FFFDF7 }
-.diploma .d1 { font: 900 22px var(--black); color: var(--navy) }
+.diploma .d1 { font: 400 24px var(--display); letter-spacing: .03em; color: var(--navy) }
 .diploma .d2 { font: 900 14px var(--black); color: var(--fruit); letter-spacing: .5px }
 .diploma .d3 { margin-top: 10px; font-size: 14px; color: var(--muted) }
-.diploma .d4 { font: 900 24px var(--black); color: var(--navy); margin: 2px 0 6px; overflow-wrap: anywhere }
+.diploma .d4 { font: 400 27px var(--display); letter-spacing: .03em; color: var(--navy); margin: 2px 0 6px; overflow-wrap: anywhere }
 .diploma .d5 { font-size: 15px }
 .win .standings { text-align: left; margin-bottom: 14px }
 .win .stats { color: var(--muted); font-size: 14px; margin: 0 0 14px }
@@ -234,8 +284,8 @@ a { color: var(--winter) }
 dialog { border: 0; border-radius: 18px; padding: 0; width: min(94vw, 640px); max-height: 88vh; box-shadow: 0 20px 60px rgba(0, 0, 0, .35); color: var(--ink) }
 dialog::backdrop { background: rgba(20, 30, 50, .55) }
 .dlg { padding: 18px 18px 16px; overflow-y: auto; max-height: 88vh }
-.dlg h2 { font: 900 21px var(--black); color: var(--navy); margin: 0 0 6px }
-.dlg h3 { font: 900 16px var(--black); color: var(--c, var(--navy)); margin: 16px 0 4px; display: flex; align-items: center; gap: 8px }
+.dlg h2 { font: 400 23px var(--display); letter-spacing: .03em; color: var(--navy); margin: 0 0 6px }
+.dlg h3 { font: 400 18px var(--display); letter-spacing: .03em; color: var(--c, var(--navy)); margin: 16px 0 4px; display: flex; align-items: center; gap: 8px }
 .dlg h3 .gi { font-size: 22px }
 .dlg p, .dlg li { font-size: 15.5px; margin: 0 0 6px }
 .dlg ol, .dlg ul { margin: 0; padding-left: 22px }
@@ -271,7 +321,7 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
 .check input { width: 22px; height: 22px }
 .check small { font-weight: 400; color: var(--muted) }
 .lobby .lead { margin: 0 0 10px; font-size: 16.5px }
-.roomcode { font: 900 52px/1 var(--black); letter-spacing: 8px; color: var(--navy); text-align: center; background: #FFF8E1; border: 3px dashed var(--reto); border-radius: 16px; padding: 14px 8px; margin-bottom: 12px; user-select: all }
+.roomcode { font: 400 54px/1 var(--display); letter-spacing: 8px; color: var(--navy); text-align: center; background: #FFF8E1; border: 3px dashed var(--reto); border-radius: 16px; padding: 14px 8px; margin-bottom: 12px; user-select: all }
 .joinrow { display: flex; gap: 14px; align-items: center; margin-bottom: 16px }
 .joinrow .qr { width: 128px; height: 128px; flex: 0 0 auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden }
 .joinrow .qr svg { width: 100%; height: 100%; display: block }
@@ -328,7 +378,7 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
 .rx-drawing { display: block; width: 100%; border: 2px solid var(--line); border-radius: 12px; background: #fff }
 .rx-sub { margin-top: 12px }
 .rx-quote { margin: 0; background: #F7F4EE; border-left: 5px solid var(--reto); border-radius: 10px; padding: 10px 12px; font-size: 17px; overflow-wrap: anywhere }
-.rx-big { font: 900 44px/1 var(--black); text-align: center; color: var(--navy); padding: 6px 0 }
+.rx-big { font: 400 46px/1 var(--display); text-align: center; color: var(--navy); padding: 6px 0 }
 .rx-olist { margin: 0; padding-left: 26px; font-size: 17px; font-weight: 700 }
 .rx-vfshow { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px }
 .rx-vfshow li { display: flex; gap: 10px; align-items: center }
@@ -349,16 +399,18 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="peach" viewBox="-68 -96 136 162"><polygon points="0,-44 18,-56 42,-50 58,-28 62,0 54,30 32,52 0,60 -32,52 -54,30 -62,0 -58,-28 -42,-50 -18,-56" fill="#2A1E4A" stroke="#2A1E4A" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/><polygon points="8,-62 30,-90 52,-86 40,-62" fill="#2A1E4A" stroke="#2A1E4A" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/><line x1="2" y1="-46" x2="7" y2="-63" stroke="#2A1E4A" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/><line x1="2" y1="-46" x2="7" y2="-63" stroke="#7A4A2A" stroke-width="4" stroke-linecap="round"/><g stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.8" stroke-linejoin="round"><polygon points="-18,-56 0,-44 2,-26" fill="#FFD3E2"/><polygon points="0,-44 18,-56 2,-26" fill="#FFC2D6"/><polygon points="18,-56 42,-50 28,-18" fill="#FFC15C"/><polygon points="18,-56 28,-18 2,-26" fill="#FFB04A"/><polygon points="42,-50 58,-28 28,-18" fill="#FFA43F"/><polygon points="58,-28 62,0 28,-18" fill="#FF8E2B"/><polygon points="62,0 26,26 28,-18" fill="#FF7A26"/><polygon points="62,0 54,30 26,26" fill="#F2652A"/><polygon points="54,30 32,52 26,26" fill="#E4512B"/><polygon points="32,52 0,60 26,26" fill="#D9472E"/><polygon points="0,60 -24,28 26,26" fill="#E8577F"/><polygon points="0,60 -32,52 -24,28" fill="#3F7FE0"/><polygon points="-32,52 -54,30 -24,28" fill="#4F8EEB"/><polygon points="-54,30 -62,0 -24,28" fill="#6AA6F2"/><polygon points="-62,0 -28,-16 -24,28" fill="#86BBF7"/><polygon points="-62,0 -58,-28 -28,-16" fill="#A6D2FB"/><polygon points="-58,-28 -42,-50 -28,-16" fill="#C6E4FF"/><polygon points="-42,-50 -18,-56 -28,-16" fill="#DDF0FF"/><polygon points="-18,-56 2,-26 -28,-16" fill="#B8DCFF"/><polygon points="2,-26 28,-18 4,4" fill="#FF8FB0"/><polygon points="28,-18 26,26 4,4" fill="#FF8A35"/><polygon points="26,26 -24,28 4,4" fill="#F7709A"/><polygon points="-24,28 -28,-16 4,4" fill="#93C4FA"/><polygon points="-28,-16 2,-26 4,4" fill="#E6A9E8"/><polygon points="8,-62 30,-90 52,-86" fill="#5BDB8C"/><polygon points="8,-62 52,-86 40,-62" fill="#22A653"/></g><path d="M-36,-34V-14M-44.7,-29L-27.3,-19M-44.7,-19L-27.3,-29" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M36,-37L38.2,-30.2L45,-28L38.2,-25.8L36,-19L33.8,-25.8L27,-28L33.8,-30.2Z" fill="#FFF6C2"/></symbol><symbol id="peach-o" viewBox="-72.5 -100.5 145 189"><g transform="translate(0 18)"><polygon points="0,-44 18,-56 42,-50 58,-28 62,0 54,30 32,52 0,60 -32,52 -54,30 -62,0 -58,-28 -42,-50 -18,-56" fill="#2A1E4A" stroke="#2A1E4A" stroke-width="21" stroke-linejoin="round" stroke-linecap="round"/><polygon points="8,-62 30,-90 52,-86 40,-62" fill="#2A1E4A" stroke="#2A1E4A" stroke-width="21" stroke-linejoin="round" stroke-linecap="round"/><line x1="2" y1="-46" x2="7" y2="-63" stroke="#2A1E4A" stroke-width="21" stroke-linejoin="round" stroke-linecap="round"/></g><polygon points="0,-44 18,-56 42,-50 58,-28 62,0 54,30 32,52 0,60 -32,52 -54,30 -62,0 -58,-28 -42,-50 -18,-56" fill="#2A1E4A" stroke="#2A1E4A" stroke-width="21" stroke-linejoin="round" stroke-linecap="round"/><polygon points="8,-62 30,-90 52,-86 40,-62" fill="#2A1E4A" stroke="#2A1E4A" stroke-width="21" stroke-linejoin="round" stroke-linecap="round"/><line x1="2" y1="-46" x2="7" y2="-63" stroke="#2A1E4A" stroke-width="21" stroke-linejoin="round" stroke-linecap="round"/><line x1="2" y1="-46" x2="7" y2="-63" stroke="#7A4A2A" stroke-width="4" stroke-linecap="round"/><g stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.8" stroke-linejoin="round"><polygon points="-18,-56 0,-44 2,-26" fill="#FFD3E2"/><polygon points="0,-44 18,-56 2,-26" fill="#FFC2D6"/><polygon points="18,-56 42,-50 28,-18" fill="#FFC15C"/><polygon points="18,-56 28,-18 2,-26" fill="#FFB04A"/><polygon points="42,-50 58,-28 28,-18" fill="#FFA43F"/><polygon points="58,-28 62,0 28,-18" fill="#FF8E2B"/><polygon points="62,0 26,26 28,-18" fill="#FF7A26"/><polygon points="62,0 54,30 26,26" fill="#F2652A"/><polygon points="54,30 32,52 26,26" fill="#E4512B"/><polygon points="32,52 0,60 26,26" fill="#D9472E"/><polygon points="0,60 -24,28 26,26" fill="#E8577F"/><polygon points="0,60 -32,52 -24,28" fill="#3F7FE0"/><polygon points="-32,52 -54,30 -24,28" fill="#4F8EEB"/><polygon points="-54,30 -62,0 -24,28" fill="#6AA6F2"/><polygon points="-62,0 -28,-16 -24,28" fill="#86BBF7"/><polygon points="-62,0 -58,-28 -28,-16" fill="#A6D2FB"/><polygon points="-58,-28 -42,-50 -28,-16" fill="#C6E4FF"/><polygon points="-42,-50 -18,-56 -28,-16" fill="#DDF0FF"/><polygon points="-18,-56 2,-26 -28,-16" fill="#B8DCFF"/><polygon points="2,-26 28,-18 4,4" fill="#FF8FB0"/><polygon points="28,-18 26,26 4,4" fill="#FF8A35"/><polygon points="26,26 -24,28 4,4" fill="#F7709A"/><polygon points="-24,28 -28,-16 4,4" fill="#93C4FA"/><polygon points="-28,-16 2,-26 4,4" fill="#E6A9E8"/><polygon points="8,-62 30,-90 52,-86" fill="#5BDB8C"/><polygon points="8,-62 52,-86 40,-62" fill="#22A653"/></g><path d="M-36,-34V-14M-44.7,-29L-27.3,-19M-44.7,-19L-27.3,-29" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M36,-37L38.2,-30.2L45,-28L38.2,-25.8L36,-19L33.8,-25.8L27,-28L33.8,-30.2Z" fill="#FFF6C2"/></symbol></defs></svg>
 <section id="setup" class="setup" hidden>
-  <div class="hero">
-    <img class="medal" src="img/centro.jpg" alt="Un melocotonero en las cuatro estaciones">
-    <div>
-      <h1><small>DEL FRÍO AL</small>FRUTO</h1>
-      <p>Un juego de preguntas para dar la vuelta al año de un frutal sin perder la fruta: del reposo del invierno a la fruta del final del verano.</p>
+  <header class="hero">
+    <svg id="scene" class="scene" aria-hidden="true" focusable="false"></svg>
+    <div class="hero-in">
+      <h1 class="wordmark" aria-label="Del frío al fruto"><span aria-hidden="true"><span class="wl wl1"><span class="l" style="--r:-4deg">D</span><span class="l" style="--r:3deg">E</span><span class="l" style="--r:-2deg">L</span><span class="sp"> </span><span class="l" style="--r:4deg">F</span><span class="l" style="--r:-3deg">R</span><span class="l" style="--r:2deg">I<svg class="flake" viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0,-10V10M-8.7,-5L8.7,5M-8.7,5L8.7,-5" stroke="#2A1E4A" stroke-width="6.5" stroke-linecap="round"/><path d="M0,-10V10M-8.7,-5L8.7,5M-8.7,5L8.7,-5" stroke="#CFE9FF" stroke-width="2.8" stroke-linecap="round"/></svg></span><span class="l" style="--r:-4deg">O</span></span><span class="wl wl2"><span class="l" style="--r:3deg">A</span><span class="l" style="--r:-2deg">L</span><span class="sp"> </span><span class="l" style="--r:-4deg">F</span><span class="l" style="--r:3deg">R</span><span class="l" style="--r:-2deg">U</span><span class="l" style="--r:4deg">T</span><svg class="peach-o" aria-hidden="true"><use href="#peach-o" width="100%" height="100%"/></svg></span></span></h1>
+      <p class="tagline">Un juego de preguntas para dar la vuelta al año de un frutal sin perder la fruta: del reposo del invierno a la fruta del final del verano.</p>
       <div class="chips"><span>De 2 a 6 equipos</span><span>A partir de 12 años</span><span>Unos 15 minutos</span></div>
     </div>
-  </div>
+  </header>
 
+  <div class="setup-main">
   <div id="resume" class="box resume" hidden></div>
 
   <div id="joinBox" class="box" hidden>
@@ -437,14 +489,15 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
   <footer class="credits">
     <img src="img/eead_horizontal.png" alt="Estación Experimental de Aula Dei (EEAD-CSIC)">
     <div><b>Juego de Daniel González Palazón</b>, Estación Experimental de Aula Dei (EEAD-CSIC). Semana de la Ciencia 2026.<br>
-      Ilustraciones generadas con la IA de Canva. Iconos de <a href="https://game-icons.net/">game-icons.net</a> (CC BY 3.0). Mundo en 3D con <a href="https://threejs.org/">three.js</a> (MIT). Licencia <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es">CC BY-NC-SA 4.0</a>.
+      Ilustraciones generadas con la IA de Canva. Iconos de <a href="https://game-icons.net/">game-icons.net</a> (CC BY 3.0). Mundo en 3D con <a href="https://threejs.org/">three.js</a> (MIT). Letras Luckiest Guy (Apache 2.0) y Nunito (SIL OFL). Licencia <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es">CC BY-NC-SA 4.0</a>.
       <span id="privacy" hidden><br>Contamos las partidas de forma anónima con GoatCounter: sin cookies y sin datos personales.</span></div>
   </footer>
+  </div>
 </section>
 
 <div id="game" class="game" data-view="card" hidden>
   <header class="bar">
-    <div class="brand"><img src="img/icono.png" alt=""><span>Del frío al fruto</span></div>
+    <div class="brand"><svg aria-hidden="true" focusable="false"><use href="#peach" width="100%" height="100%"/></svg><span>Del frío al fruto</span></div>
     <div class="round" id="roundInfo"></div>
     <button id="clock" class="clock" type="button" data-act="clock" aria-label="Pausar o seguir el reloj" hidden></button>
     <button id="speed" class="iconbtn wide" type="button" data-act="speed" aria-label="Velocidad de las fichas">×1</button>
@@ -511,9 +564,10 @@ dialog::backdrop { background: rgba(20, 30, 50, .55) }
   </div>
 </dialog>
 
-<script src="datos.js?v=ef39afbfed"></script>
-<script src="sala.js?v=ef39afbfed"></script>
-<script src="retos.js?v=ef39afbfed"></script>
-<script src="juego.js?v=ef39afbfed"></script>
+<script src="datos.js?v=afb467b5d9"></script>
+<script src="sala.js?v=afb467b5d9"></script>
+<script src="retos.js?v=afb467b5d9"></script>
+<script src="juego.js?v=afb467b5d9"></script>
+<script src="portada.js?v=afb467b5d9"></script>
 </body>
 </html>

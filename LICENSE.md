@@ -18,3 +18,4 @@ Puedes compartir y adaptar el material siempre que:
 - Los logotipos de la Estación Experimental de Aula Dei (EEAD-CSIC) son propiedad de la institución y no se incluyen en esta licencia.
 - Los iconos proceden de [game-icons.net](https://game-icons.net/) y se distribuyen con licencia [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
 - La versión para el navegador (`docs/`) incluye en `docs/vendor/` las bibliotecas [three.js](https://threejs.org/) y [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator), que conservan su licencia MIT.
+- La versión para el navegador incluye también en `docs/fonts/` dos tipos de letra de Google Fonts, cada uno con su licencia al lado: [Luckiest Guy](https://fonts.google.com/specimen/Luckiest+Guy), de Astigmatic, con licencia Apache 2.0, y [Nunito](https://fonts.google.com/specimen/Nunito), de The Nunito Project Authors, con licencia SIL Open Font License 1.1.
