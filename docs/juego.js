@@ -369,7 +369,7 @@
     const opts = mode === "mundo"
       ? { ...common, zones: D.board.zones, events: D.board.events, retos: D.board.retos, quality: QUALITY }
       : { ...common, texture: D.board.texture, slots: D.board.slots, decks: D.decks, reto: D.reto };
-    import(view.file).then((m) => m.create($(view.host), opts))
+    import(view.file + (CFG.v ? "?v=" + CFG.v : "")).then((m) => m.create($(view.host), opts))
       .then((v) => { view.v = v; view.st = "ready"; if (S) drawBoard(); })
       .catch((e) => fail(e && e.message));
   }

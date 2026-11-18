@@ -123,36 +123,46 @@ window.Sala = (function () {
   }
 
   // § 4 — Writes go out one at a time and only the latest value waits, so a slow connection
-  // never delivers an old state after a newer one
+  // never delivers an old state after a newer one. stop() drops what is still waiting and
+  // resolves once the write already on its way has landed.
   function writer(send) {
-    let pending, has = false, busy = false, fails = 0;
+    let pending, has = false, busy = null, fails = 0, stopped = false;
     const flush = () => {
-      if (busy || !has) return;
+      if (busy || !has || stopped) return;
       const value = pending;
-      has = false; busy = true;
-      send(value).then(() => { fails = 0; }, () => { fails++; if (!has) { pending = value; has = true; } })
-        .then(() => { busy = false; if (has) setTimeout(flush, fails ? Math.min(4000, 400 * fails) : 0); });
+      has = false;
+      busy = send(value).then(() => { fails = 0; }, () => { fails++; if (!has) { pending = value; has = true; } })
+        .then(() => { busy = null; if (has) setTimeout(flush, fails ? Math.min(4000, 400 * fails) : 0); });
     };
-    return (value, merge) => {
+    const push = (value, merge) => {
       pending = merge && has && pending && typeof pending === "object" ? Object.assign({}, pending, value) : value;
       has = true;
       flush();
     };
+    push.stop = () => { stopped = true; has = false; return busy || Promise.resolve(); };
+    return push;
   }
 
   // § 5 — The two ends of a room
   function host(t, code, handlers) {
     const base = `salas/${code}`;
-    let beat = 0, last = null;
+    let beat = 0, last = null, closed = false, beating = Promise.resolve();
     const pushState = writer((s) => t.put(`${base}/p/e`, s));
-    const pulse = () => t.put(`${base}/p/h`, ++beat).catch(() => {});
+    const pulse = () => { if (!closed) beating = t.put(`${base}/p/h`, ++beat).catch(() => {}); };
     pulse();
     const timer = setInterval(pulse, 20000);
     const stop = t.listen(`${base}/c`, (tree) => handlers.onClients(tree || {}), handlers.onStatus);
     return {
       code,
-      publish(state) { const s = JSON.stringify(state); if (s !== last) { last = s; pushState(s); } },
-      close(remove) { clearInterval(timer); stop(); if (remove) t.del(base).catch(() => {}); },
+      publish(state) { if (closed) return; const s = JSON.stringify(state); if (s !== last) { last = s; pushState(s); } },
+      // Removing the room waits for the writes already on their way, otherwise one landing after
+      // the delete would bring the room back; a second delete a moment later catches any straggler
+      close(remove) {
+        closed = true; clearInterval(timer); stop();
+        if (!remove) { pushState.stop(); return; }
+        const del = () => t.del(base).catch(() => {});
+        Promise.all([pushState.stop(), beating]).then(del).then(() => setTimeout(del, 2500));
+      },
     };
   }
 
