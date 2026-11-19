@@ -176,7 +176,7 @@
     const rr = `x="${CX - A}" y="${CY - B}" width="${2 * A}" height="${2 * B}" rx="${R}" fill="none"`;
     out += `<rect ${rr} stroke="${hex(C.navy)}" stroke-opacity="0.13" stroke-width="${BAND + 2}"/><rect ${rr} stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="${BAND}"/>`;
 
-    // Painted corner vignettes, each ringed with the colour of its season
+    // Paper-cut corner vignettes, each ringed with the colour of its season
     const corner = (slot, season, cx, cy) => `<clipPath id="cl-${slot}"><circle cx="${cx}" cy="${cy}" r="13.6"/></clipPath>
       <circle cx="${cx + 0.6}" cy="${cy + 0.9}" r="15.5" fill="${hex(C.navy)}" fill-opacity="0.25"/><circle cx="${cx}" cy="${cy}" r="15.5" fill="${hex(C[season])}"/>
       <image href="img/esquina_${slot}.jpg" x="${cx - 13.6}" y="${cy - 13.6}" width="27.2" height="27.2" clip-path="url(#cl-${slot})" preserveAspectRatio="xMidYMid slice"/>`;
@@ -184,11 +184,12 @@
 
     out += g.portrait ? innerPortrait(g) : innerLandscape(g);
 
-    // Centre medallion: the painted tree in four seasons, with the EEAD symbol where they meet
+    // Centre medallion: the paper-cut tree in four seasons, with the EEAD symbol where they meet.
+    // The picture already splits the seasons along the axes, so no cross is drawn over it (the
+    // trunk runs down the vertical axis), as on the printed board.
     out += `<g transform="translate(${CX} ${CY})"><clipPath id="cl-med"><circle r="53"/></clipPath>
       <circle cx="0.9" cy="1.3" r="57" fill="${hex(C.navy)}" fill-opacity="0.22"/><circle r="57" fill="#FFFFFF"/>
-      <g clip-path="url(#cl-med)"><image href="img/centro.jpg" x="-53" y="-53" width="106" height="106" preserveAspectRatio="xMidYMid slice"/>
-      <line x1="-60" y1="0" x2="60" y2="0" stroke="#FFFFFF" stroke-width="1.4"/><line x1="0" y1="-60" x2="0" y2="60" stroke="#FFFFFF" stroke-width="1.4"/></g>
+      <g clip-path="url(#cl-med)"><image href="img/centro.jpg" x="-53" y="-53" width="106" height="106" preserveAspectRatio="xMidYMid slice"/></g>
       <circle r="53" fill="none" stroke="${hex(C.navy)}" stroke-width="0.7"/><circle r="57" fill="none" stroke="${hex(C.navy)}" stroke-width="0.5"/>
       <circle cx="0.4" cy="0.6" r="10.4" fill="${hex(C.navy)}" fill-opacity="0.25"/><circle r="10.2" fill="#FFFFFF"/>
       <image href="img/eead_simbolo.png" x="-8.8" y="-8.8" width="17.6" height="17.6"/><circle r="10.2" fill="none" stroke="${hex(C.navy)}" stroke-width="0.5"/></g>`;

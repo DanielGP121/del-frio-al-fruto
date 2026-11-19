@@ -1,10 +1,17 @@
 # Only the printable kit is published: the seven PDFs, the README and the licence.
-# Everything else in this folder (sources, internal notes, previews) stays out of the repository.
+# Everything else in this folder (sources, internal notes, previews, and the PDFs of other
+# versions and styles in _versiones/) stays out of the repository.
 *
 !.gitignore
 !README.md
 !LICENSE.md
-!0[1-5]_*.pdf
+!01_tablero_A3.pdf
+!01_tablero_en_dos_A4.pdf
+!02_tarjetas_doble_cara.pdf
+!02_tarjetas_solo_frentes.pdf
+!03_fichas_y_paletas.pdf
+!04_reglas.pdf
+!05_diplomas.pdf
 # Browser version of the game, served by GitHub Pages from docs/ (page, script, data and light images)
 !docs/
 !docs/**

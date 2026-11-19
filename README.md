@@ -18,7 +18,7 @@ Si has llegado aquí escaneando el QR de las reglas o del diploma, gracias: así
 | [02_tarjetas_solo_frentes.pdf](02_tarjetas_solo_frentes.pdf) | Las mismas tarjetas, sin dorso | 12 hojas A4 a una cara |
 | [03_fichas_y_paletas.pdf](03_fichas_y_paletas.pdf) | Fichas de equipo y paletas A, B y C | 2 hojas A4, mejor en cartulina |
 | [04_reglas.pdf](04_reglas.pdf) | Las reglas | 1 hoja A4 |
-| [05_diplomas.pdf](05_diplomas.pdf) | Diploma para quien llega a la meta | 1 hoja A4 con dos diplomas |
+| [05_diplomas.pdf](05_diplomas.pdf) | Diploma para quien llega a la meta | 1 hoja A4 con cuatro diplomas A6, que se cortan por las líneas de puntos |
 
 Para bajar un PDF, ábrelo y pulsa el botón de descarga, arriba a la derecha.
 
@@ -35,7 +35,7 @@ Entre 2 y 6 equipos, a partir de 12 años, unos 15 minutos. Quien arbitra lee un
 ## Créditos
 
 - Juego, preguntas y diseño: Daniel González Palazón (EEAD-CSIC).
-- Ilustraciones pintadas: generadas con la inteligencia artificial de Canva.
+- Ilustraciones de papel recortado: generadas con inteligencia artificial en Higgsfield.
 - Iconos: [game-icons.net](https://game-icons.net/), con licencia [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
 - Logotipos: Estación Experimental de Aula Dei (EEAD-CSIC).
 
